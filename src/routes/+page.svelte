@@ -140,7 +140,7 @@
 </section>
 
 <!-- About Section -->
-<section class="py-32 px-4 relative overflow-hidden">
+<section class="py-32 px-4 relative overflow-hidden bg-black/90">
   <!-- Background effects -->
   <div class="absolute inset-0">
     <div class="absolute top-0 left-0 w-96 h-96 bg-gym-red/10 rounded-full blur-3xl"></div>
@@ -250,7 +250,7 @@
 </section>
 
 <!-- Featured Instructor -->
-<section class="py-32 px-4 relative overflow-hidden">
+<section class="py-32 px-4 bg-black/90 relative overflow-hidden">
   <!-- Hexagon pattern background -->
   <div class="absolute inset-0 opacity-5">
     <svg width="100%" height="100%">
@@ -428,7 +428,7 @@
         <span class="block text-6xl md:text-8xl glitch">EVOLVE?</span>
       </h2>
       
-      <p class="text-xl md:text-2xl opacity-90 max-w-2xl mx-auto">
+      <p class="text-xl md:text-2xl opacity-90 max-w-2xl mx-auto text-black/80">
         The future of fitness is here. Join the elite few who refuse to accept limitations.
       </p>
       
