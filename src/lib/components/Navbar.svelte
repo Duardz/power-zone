@@ -64,14 +64,6 @@
           </a>
         {/each}
         
-        <a 
-          href="/admin/login" 
-          class="ml-4 px-6 py-2 bg-gym-red/10 border border-gym-red/50 rounded
-                 hover:bg-gym-red hover:border-gym-red text-gray-300 hover:text-white font-bold text-sm tracking-wider
-                 transition-all duration-300 neon-button hover:shadow-[0_0_30px_rgba(220,38,38,0.5)]"
-        >
-          ADMIN
-        </a>
       </div>
       
       <!-- Mobile menu button -->
