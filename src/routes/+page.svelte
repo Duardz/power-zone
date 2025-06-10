@@ -29,21 +29,21 @@
   recentPosts = [
     {
       id: '1',
-      title: 'HIIT Revolution Begins',
-      content: 'Experience the future of high-intensity training with our new tech-enhanced sessions.',
+      title: 'Community Workout This Saturday',
+      content: 'Join us for a free community workout session. All fitness levels welcome!',
       date: new Date('2025-01-15'),
       imageURL: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=2070'
     },
     {
       id: '2',
-      title: 'Biohacking Workshop',
-      content: 'Optimize your performance with cutting-edge nutrition and recovery techniques.',
+      title: 'New Equipment Arrived',
+      content: 'We just added new dumbbells and resistance bands. Come check them out!',
       date: new Date('2025-01-10'),
     },
     {
       id: '3',
-      title: 'Neural Training Program',
-      content: 'Mind-muscle connection redefined. Join our revolutionary training methodology.',
+      title: 'Welcome New Members',
+      content: 'Big welcome to all our new January members. Remember, every journey starts with a single step!',
       date: new Date('2025-01-05'),
       imageURL: 'https://images.unsplash.com/photo-1550345332-09e3ac987658?q=80&w=1887'
     }
@@ -51,11 +51,11 @@
 </script>
 
 <svelte:head>
-  <title>Power Zone - Enter The Digital Fitness Revolution</title>
+  <title>PowerZone Gym - Your Local Fitness Community in Dingalan, Aurora</title>
 </svelte:head>
 
 <!-- Hero Section -->
-<section class="relative min-h-screen flex items-center justify-center overflow-hidden">
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden bg-black/90">
   <!-- Animated Background -->
   <div class="absolute inset-0">
     <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
@@ -92,38 +92,38 @@
     <div class="mb-8 animate-slide-up">
       <span class="inline-block px-4 py-1 bg-gym-red/20 border border-gym-red/50 rounded-full 
                    text-gym-red text-sm font-bold tracking-wider uppercase">
-        Welcome to the future
+        Purok Mulawin, Paltic, Dingalan
       </span>
     </div>
     
     <h1 class="text-6xl md:text-8xl font-black mb-6 leading-none animate-slide-up" style="animation-delay: 0.1s">
-      <span class="block text-white glitch">ENTER THE</span>
+      <span class="block text-white">STEP INTO THE</span>
       <span class="block text-gym-red glow-text text-7xl md:text-9xl">ZONE</span>
     </h1>
     
     <p class="text-xl md:text-2xl text-gray-300 mb-12 max-w-2xl mx-auto animate-slide-up" style="animation-delay: 0.2s">
-      Where human potential meets cutting-edge technology. 
-      Transform your body. Upgrade your mind. Become limitless.
+      Where every rep counts and every effort matters. 
+      Real people. Real progress. Real community.
     </p>
     
     <div class="flex flex-col sm:flex-row gap-6 justify-center animate-slide-up" style="animation-delay: 0.3s">
       <a 
         href="/membership" 
-        class="group relative px-10 py-4 bg-gym-red font-black text-lg tracking-wider uppercase
+        class="group relative px-10 py-4 bg-gym-red text-white font-black text-lg tracking-wider uppercase
                overflow-hidden transition-all duration-300 hover:shadow-[0_0_50px_rgba(220,38,38,0.7)]"
       >
-        <span class="relative z-10">Initialize Training</span>
+        <span class="relative z-10">Start Your Journey</span>
         <div class="absolute inset-0 bg-gradient-to-r from-red-600 to-red-800 translate-x-full 
                     group-hover:translate-x-0 transition-transform duration-300"></div>
       </a>
       
       <a 
         href="/about" 
-        class="px-10 py-4 border-2 border-gym-red/50 font-black text-lg tracking-wider uppercase
+        class="px-10 py-4 border-2 border-gym-red/50 text-white font-black text-lg tracking-wider uppercase
                hover:bg-gym-red/10 hover:border-gym-red transition-all duration-300
                hover:shadow-[0_0_30px_rgba(220,38,38,0.3)]"
       >
-        System Specs
+        Meet The Team
       </a>
     </div>
   </div>
@@ -131,7 +131,7 @@
   <!-- Scroll Indicator -->
   <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
     <div class="flex flex-col items-center gap-2 text-gym-red">
-      <span class="text-xs font-bold tracking-wider uppercase">Dive Deeper</span>
+      <span class="text-xs font-bold tracking-wider uppercase">Discover More</span>
       <svg class="w-6 h-6 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
       </svg>
@@ -152,28 +152,31 @@
       <div class="space-y-8 animate-slide-up">
         <div class="inline-block">
           <span class="px-3 py-1 bg-gym-red/20 border border-gym-red/50 rounded text-gym-red text-sm font-bold tracking-wider uppercase">
-            Beyond Fitness
+            Community First
           </span>
         </div>
         
         <h2 class="text-5xl md:text-6xl font-black leading-tight">
-          MORE THAN A <span class="text-gym-red glow-text">GYM</span>
+          NOT JUST A <span class="text-gym-red glow-text">GYM</span>
           <br/>
-          <span class="text-3xl md:text-4xl text-gray-400">IT'S A TRANSFORMATION LAB</span>
+          <span class="text-3xl md:text-4xl text-gray-400">A LOCAL FITNESS FAMILY</span>
         </h2>
         
         <p class="text-gray-300 text-lg leading-relaxed">
-          Power Zone isn't just a place to work out—it's where human evolution accelerates. 
-          Our state-of-the-art facility combines cutting-edge technology with proven training 
-          methodologies to unlock your maximum potential.
+          We're not pros. We're locals who just want to build a better, healthier community — one step at a time. 
+          At PowerZone, we believe fitness doesn't have to be fancy to be effective.
+        </p>
+        
+        <p class="text-gray-300 text-lg leading-relaxed">
+          No complicated machines. No egos. Just real people trying to get stronger, together.
         </p>
         
         <div class="grid grid-cols-2 gap-6">
           {#each [
-            { number: '10K+', label: 'Warriors Trained' },
-            { number: '500+', label: 'Classes Monthly' },
-            { number: '98%', label: 'Success Rate' },
-            { number: '24/7', label: 'Access Available' }
+            { number: '2024', label: 'Established' },
+            { number: '24/7', label: 'Member Support' },
+            { number: '100%', label: 'Local Owned' },
+            { number: '₱399', label: 'Starting Price' }
           ] as stat}
             <div class="group">
               <div class="futuristic-card p-6 border border-gray-800 hover:border-gym-red/50 transition-all duration-300">
@@ -194,7 +197,7 @@
         <div class="relative overflow-hidden rounded-lg">
           <img 
             src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=2070" 
-            alt="Gym Interior" 
+            alt="PowerZone Gym Interior" 
             class="w-full rounded-lg group-hover:scale-105 transition-transform duration-700"
           />
           
@@ -211,8 +214,8 @@
         <!-- Floating badge -->
         <div class="absolute -bottom-8 -left-8 bg-black border-2 border-gym-red p-6 
                     hover:shadow-[0_0_30px_rgba(220,38,38,0.5)] transition-all duration-300">
-          <p class="text-5xl font-black text-gym-red glow-text">15+</p>
-          <p class="text-sm uppercase tracking-wider">Years of Excellence</p>
+          <p class="text-5xl font-black text-gym-red glow-text">2024</p>
+          <p class="text-sm uppercase tracking-wider">Founded</p>
         </div>
         
         <!-- Corner accents -->
@@ -224,14 +227,14 @@
 </section>
 
 <!-- Features Grid -->
-<section class="py-20 px-4 bg-black/50">
+<section class="py-20 px-4 bg-black/80">
   <div class="container mx-auto max-w-7xl">
     <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
       {#each [
-        { icon: '⚡', title: 'High-Tech Equipment', desc: 'AI-powered machines that adapt to your strength' },
-        { icon: '🧬', title: 'Biometric Tracking', desc: 'Real-time performance analytics and optimization' },
-        { icon: '🎯', title: 'Precision Training', desc: 'Targeted programs based on your DNA profile' },
-        { icon: '🚀', title: 'Recovery Tech', desc: 'Cryotherapy, infrared sauna, and more' }
+        { icon: '🏋️', title: 'Full Equipment Access', desc: 'Use everything we have, no hidden restrictions' },
+        { icon: '💦', title: 'Free Water Station', desc: 'Stay hydrated anytime with our refill station' },
+        { icon: '🧍‍♂️', title: 'Basic Guidance', desc: 'Get help with equipment and beginner tips' },
+        { icon: '👥', title: 'No Pressure Vibe', desc: 'Come as you are, train at your pace' }
       ] as feature, i}
         <div 
           class="futuristic-card p-6 border border-gray-800 hover:border-gym-red/50 
@@ -249,8 +252,8 @@
   </div>
 </section>
 
-<!-- Featured Instructor -->
-<section class="py-32 px-4 bg-black/90 relative overflow-hidden">
+<!-- Featured Staff -->
+<section class="py-32 px-4 relative overflow-hidden bg-black/90">
   <!-- Hexagon pattern background -->
   <div class="absolute inset-0 opacity-5">
     <svg width="100%" height="100%">
@@ -265,10 +268,10 @@
     <div class="text-center mb-16">
       <span class="inline-block px-4 py-1 bg-gym-red/20 border border-gym-red/50 rounded-full 
                    text-gym-red text-sm font-bold tracking-wider uppercase mb-4">
-        Master Trainer
+        Meet the Team
       </span>
       <h2 class="text-5xl md:text-6xl font-black">
-        MEET YOUR <span class="text-gym-red glow-text">ARCHITECT</span>
+        YOUR LOCAL <span class="text-gym-red glow-text">SUPPORT</span>
       </h2>
     </div>
     
@@ -280,7 +283,7 @@
           <div class="relative overflow-hidden rounded-lg">
             <img 
               src="https://images.unsplash.com/photo-1567013127542-490d757e51fc?q=80&w=1887" 
-              alt="Marcus Johnson" 
+              alt="Anthony Cerenas" 
               class="w-full rounded-lg group-hover:scale-105 transition-transform duration-700"
             />
             
@@ -290,12 +293,12 @@
             <!-- Stats overlay -->
             <div class="absolute bottom-4 left-4 right-4 grid grid-cols-2 gap-2">
               <div class="bg-black/80 backdrop-blur border border-gym-red/50 p-3 text-center">
-                <p class="text-2xl font-black text-gym-red">20+</p>
-                <p class="text-xs uppercase tracking-wider">Years XP</p>
+                <p class="text-2xl font-black text-gym-red">24/7</p>
+                <p class="text-xs uppercase tracking-wider">Support</p>
               </div>
               <div class="bg-black/80 backdrop-blur border border-gym-red/50 p-3 text-center">
-                <p class="text-2xl font-black text-gym-red">1K+</p>
-                <p class="text-xs uppercase tracking-wider">Transformed</p>
+                <p class="text-2xl font-black text-gym-red">100%</p>
+                <p class="text-xs uppercase tracking-wider">Local</p>
               </div>
             </div>
           </div>
@@ -307,34 +310,33 @@
         
         <div class="space-y-6">
           <div>
-            <h3 class="text-3xl font-black mb-2">MARCUS JOHNSON</h3>
-            <p class="text-gym-red font-bold tracking-wider uppercase">Founder & Lead Architect</p>
+            <h3 class="text-3xl font-black mb-2">ANTHONY CERENAS</h3>
+            <p class="text-gym-red font-bold tracking-wider uppercase">Gym Staff & Community Motivator</p>
           </div>
           
           <p class="text-gray-300 leading-relaxed">
-            Former special ops turned fitness revolutionary. Marcus doesn't just train bodies—he 
-            engineers human machines. His proprietary ZONE methodology combines military precision 
-            with cutting-edge sports science to deliver unprecedented results.
+            Anthony is the heart of PowerZone. Not a certified trainer (yet!), but always there to help you settle in, 
+            stay consistent, and make your workouts count. Friendly, approachable, and committed to learning alongside our members.
           </p>
           
           <div class="space-y-3">
             <div class="flex items-center gap-3">
               <div class="w-2 h-2 bg-gym-red rounded-full"></div>
-              <span class="text-sm text-gray-400">Certified Biomechanics Specialist</span>
+              <span class="text-sm text-gray-400">Dingalan Local</span>
             </div>
             <div class="flex items-center gap-3">
               <div class="w-2 h-2 bg-gym-red rounded-full"></div>
-              <span class="text-sm text-gray-400">Neural Performance Optimization</span>
+              <span class="text-sm text-gray-400">Everyday Grind Enthusiast</span>
             </div>
             <div class="flex items-center gap-3">
               <div class="w-2 h-2 bg-gym-red rounded-full"></div>
-              <span class="text-sm text-gray-400">Advanced Nutrition Programming</span>
+              <span class="text-sm text-gray-400">Community First Mindset</span>
             </div>
           </div>
           
           <a href="/about" class="inline-flex items-center gap-2 text-gym-red font-bold 
                                   hover:gap-4 transition-all duration-300 group">
-            <span>Access Full Profile</span>
+            <span>Learn More About Us</span>
             <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
@@ -351,10 +353,10 @@
     <div class="text-center mb-16">
       <span class="inline-block px-4 py-1 bg-gym-red/20 border border-gym-red/50 rounded-full 
                    text-gym-red text-sm font-bold tracking-wider uppercase mb-4">
-        Intel Feed
+        Updates
       </span>
       <h2 class="text-5xl md:text-6xl font-black">
-        LATEST <span class="text-gym-red glow-text">TRANSMISSIONS</span>
+        LATEST <span class="text-gym-red glow-text">NEWS</span>
       </h2>
     </div>
     
@@ -370,23 +372,10 @@
           </div>
         {/each}
       </div>
-      
-      <div class="text-center mt-12">
-        <a href="/blog" class="inline-flex items-center gap-3 px-8 py-3 
-                               bg-gym-red/10 border border-gym-red/50 
-                               hover:bg-gym-red hover:border-gym-red
-                               font-bold uppercase tracking-wider transition-all duration-300
-                               hover:shadow-[0_0_30px_rgba(220,38,38,0.5)]">
-          <span>Access Full Database</span>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </a>
-      </div>
     {:else}
       <div class="text-center py-20">
         <div class="inline-block p-8 border border-gray-800 rounded-lg">
-          <p class="text-gray-400 mb-4">No transmissions detected</p>
+          <p class="text-gray-400 mb-4">No posts yet</p>
           <div class="flex justify-center gap-1">
             <div class="w-2 h-2 bg-gray-600 rounded-full animate-pulse"></div>
             <div class="w-2 h-2 bg-gray-600 rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
@@ -399,7 +388,7 @@
 </section>
 
 <!-- CTA Section -->
-<section class="relative py-32 px-4 overflow-hidden">
+<section class="relative py-32 px-4 overflow-hidden bg-black/90">
   <!-- Animated background -->
   <div class="absolute inset-0 bg-gym-red">
     <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070')] 
@@ -425,11 +414,11 @@
     <div class="space-y-8">
       <h2 class="text-5xl md:text-7xl font-black leading-tight">
         READY TO
-        <span class="block text-6xl md:text-8xl glitch">EVOLVE?</span>
+        <span class="block text-6xl md:text-8xl glitch">TRANSFORM?</span>
       </h2>
       
-      <p class="text-xl md:text-2xl opacity-90 max-w-2xl mx-auto text-black/80">
-        The future of fitness is here. Join the elite few who refuse to accept limitations.
+      <p class="text-xl md:text-2xl opacity-90 max-w-2xl mx-auto">
+        Join our growing fitness family. Start your journey today for as low as ₱399/month.
       </p>
       
       <div class="flex flex-col sm:flex-row gap-6 justify-center pt-8">
@@ -438,7 +427,7 @@
           class="group relative px-12 py-5 bg-black font-black text-lg tracking-wider uppercase
                  overflow-hidden transition-all duration-300 hover:shadow-[0_0_50px_rgba(0,0,0,0.5)]"
         >
-          <span class="relative z-10">INITIATE PROTOCOL</span>
+          <span class="relative z-10">VIEW MEMBERSHIPS</span>
           <div class="absolute inset-0 bg-gradient-to-r from-gray-900 to-black 
                       translate-x-full group-hover:translate-x-0 transition-transform duration-500"></div>
         </a>
@@ -449,7 +438,7 @@
                  font-black text-lg tracking-wider uppercase
                  hover:bg-black/40 transition-all duration-300"
         >
-          REQUEST ACCESS
+          CONTACT US
         </a>
       </div>
     </div>

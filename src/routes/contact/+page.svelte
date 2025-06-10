@@ -42,12 +42,12 @@
       //   timestamp: new Date()
       // });
       
-      submitMessage = 'Message transmitted successfully! We\'ll contact you within 24 hours.';
+      submitMessage = 'Message sent! We\'ll contact you within 24 hours.';
       submitStatus = 'success';
       formData = { name: '', email: '', phone: '', message: '', interest: 'general' };
     } catch (error) {
       console.error('Error submitting form:', error);
-      submitMessage = 'Transmission failed. Please try again or call us directly.';
+      submitMessage = 'Failed to send. Please call us at +63 926 922 8903.';
       submitStatus = 'error';
     } finally {
       isSubmitting = false;
@@ -56,11 +56,11 @@
 </script>
 
 <svelte:head>
-  <title>Contact Power Zone - Begin Your Transformation</title>
+  <title>Contact PowerZone - Gym in Dingalan, Aurora</title>
 </svelte:head>
 
 <!-- Hero Section -->
-<section class="relative py-32 px-4 overflow-hidden">
+<section class="relative py-32 px-4 overflow-hidden bg-black/90">
   <!-- Animated background -->
   <div class="absolute inset-0">
     <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
@@ -85,32 +85,32 @@
   <div class="container mx-auto max-w-4xl text-center relative z-10">
     <div class="inline-block px-4 py-1 bg-gym-red/20 border border-gym-red/50 rounded-full 
                 text-gym-red text-sm font-bold tracking-wider uppercase mb-6 animate-slide-up">
-      Initialize Contact
+      Get In Touch
     </div>
     <h1 class="text-6xl md:text-7xl font-black mb-6 animate-slide-up" style="animation-delay: 0.1s">
-      CONNECT TO THE <span class="text-gym-red glow-text glitch">ZONE</span>
+      CONNECT WITH <span class="text-gym-red glow-text glitch">POWERZONE</span>
     </h1>
     <p class="text-xl text-gray-300 max-w-2xl mx-auto animate-slide-up" style="animation-delay: 0.2s">
-      Ready to transform? Our team is standing by to architect your fitness future.
+      Ready to start your fitness journey? We're here to help you take the first step.
     </p>
   </div>
 </section>
 
 <!-- Contact Section -->
-<section class="py-20 px-4 relative">
+<section class="py-20 px-4 relative bg-black/80">
   <div class="container mx-auto max-w-7xl">
     <div class="grid lg:grid-cols-2 gap-16">
       <!-- Contact Form -->
       <div class="{mounted ? 'animate-slide-up' : ''}">
         <div class="futuristic-card p-8 border border-gray-800 hover:border-gym-red/30 transition-all duration-500">
-          <h2 class="text-3xl font-black mb-2">INITIATE TRANSMISSION</h2>
-          <p class="text-gray-400 mb-8">Fill out the form and we'll respond within 24 hours.</p>
+          <h2 class="text-3xl font-black mb-2">SEND US A MESSAGE</h2>
+          <p class="text-gray-400 mb-8">Have questions? Want to join? Drop us a message!</p>
           
           <form on:submit={handleSubmit} class="space-y-6">
             <!-- Name Field -->
             <div class="relative">
               <label for="name" class="block text-sm font-bold uppercase tracking-wider mb-2 text-gray-400">
-                Full Name <span class="text-gym-red">*</span>
+                Your Name <span class="text-gym-red">*</span>
               </label>
               <input
                 type="text"
@@ -122,7 +122,7 @@
                 class="w-full px-4 py-3 bg-black border border-gray-800 rounded-lg 
                        focus:border-gym-red focus:outline-none transition-all duration-300
                        hover:border-gray-700"
-                placeholder="John Connor"
+                placeholder="Juan Dela Cruz"
               />
               {#if focusedField === 'name'}
                 <div class="absolute bottom-0 left-0 w-full h-0.5 bg-gym-red animate-pulse"></div>
@@ -144,7 +144,7 @@
                 class="w-full px-4 py-3 bg-black border border-gray-800 rounded-lg 
                        focus:border-gym-red focus:outline-none transition-all duration-300
                        hover:border-gray-700"
-                placeholder="warrior@powerzone.gym"
+                placeholder="your.email@gmail.com"
               />
               {#if focusedField === 'email'}
                 <div class="absolute bottom-0 left-0 w-full h-0.5 bg-gym-red animate-pulse"></div>
@@ -165,7 +165,7 @@
                 class="w-full px-4 py-3 bg-black border border-gray-800 rounded-lg 
                        focus:border-gym-red focus:outline-none transition-all duration-300
                        hover:border-gray-700"
-                placeholder="+1 (555) 123-4567"
+                placeholder="+63 9XX XXX XXXX"
               />
               {#if focusedField === 'phone'}
                 <div class="absolute bottom-0 left-0 w-full h-0.5 bg-gym-red animate-pulse"></div>
@@ -175,7 +175,7 @@
             <!-- Interest Field -->
             <div class="relative">
               <label for="interest" class="block text-sm font-bold uppercase tracking-wider mb-2 text-gray-400">
-                Primary Interest
+                What are you interested in?
               </label>
               <select
                 id="interest"
@@ -188,9 +188,8 @@
               >
                 <option value="general">General Inquiry</option>
                 <option value="membership">Membership Information</option>
-                <option value="personal-training">Personal Training</option>
-                <option value="corporate">Corporate Packages</option>
-                <option value="tour">Schedule a Tour</option>
+                <option value="visit">Schedule a Visit</option>
+                <option value="feedback">Feedback/Suggestions</option>
               </select>
               {#if focusedField === 'interest'}
                 <div class="absolute bottom-0 left-0 w-full h-0.5 bg-gym-red animate-pulse"></div>
@@ -200,7 +199,7 @@
             <!-- Message Field -->
             <div class="relative">
               <label for="message" class="block text-sm font-bold uppercase tracking-wider mb-2 text-gray-400">
-                Message <span class="text-gym-red">*</span>
+                Your Message <span class="text-gym-red">*</span>
               </label>
               <textarea
                 id="message"
@@ -212,7 +211,7 @@
                 class="w-full px-4 py-3 bg-black border border-gray-800 rounded-lg 
                        focus:border-gym-red focus:outline-none transition-all duration-300
                        hover:border-gray-700 resize-none"
-                placeholder="Tell us about your fitness goals..."
+                placeholder="Tell us how we can help you..."
               ></textarea>
               {#if focusedField === 'message'}
                 <div class="absolute bottom-0 left-0 w-full h-0.5 bg-gym-red animate-pulse"></div>
@@ -229,7 +228,7 @@
                      disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span class="relative z-10">
-                {isSubmitting ? 'TRANSMITTING...' : 'SEND TRANSMISSION'}
+                {isSubmitting ? 'SENDING...' : 'SEND MESSAGE'}
               </span>
               <div class="absolute inset-0 bg-gradient-to-r from-red-600 to-red-800 
                           translate-x-full group-hover:translate-x-0 transition-transform duration-500"></div>
@@ -260,21 +259,21 @@
           {#each [
             { 
               icon: '📍', 
-              title: 'HEADQUARTERS', 
-              lines: ['123 Fitness Street', 'Gym City, GC 12345'],
-              action: { text: 'Get Directions', href: 'https://maps.google.com' }
+              title: 'GYM LOCATION', 
+              lines: ['Purok Mulawin, Paltic', 'Dingalan, Aurora'],
+              action: { text: 'Get Directions', href: 'https://maps.google.com/?q=Purok+Mulawin+Paltic+Dingalan+Aurora' }
             },
             { 
               icon: '📞', 
-              title: 'DIRECT LINE', 
-              lines: ['(555) 123-4567', 'Mon-Fri: 5AM-11PM'],
-              action: { text: 'Call Now', href: 'tel:+15551234567' }
+              title: 'CALL US', 
+              lines: ['+63 926 922 8903', 'Available 7 days a week'],
+              action: { text: 'Call Now', href: 'tel:+639269228903' }
             },
             { 
               icon: '✉️', 
-              title: 'DIGITAL CONTACT', 
-              lines: ['info@powerzone.gym', 'Response within 24h'],
-              action: { text: 'Email Us', href: 'mailto:info@powerzone.gym' }
+              title: 'EMAIL', 
+              lines: ['powerzone@gmail.com', 'We reply within 24 hours'],
+              action: { text: 'Send Email', href: 'mailto:powerzone@gmail.com' }
             }
           ] as info}
             <div class="futuristic-card p-6 border border-gray-800 hover:border-gym-red/50 
@@ -305,24 +304,27 @@
           {/each}
         </div>
         
-        <!-- Operating Hours -->
+        <!-- Why PowerZone -->
         <div class="futuristic-card p-6 border border-gray-800">
-          <h3 class="font-black text-gym-red uppercase tracking-wider mb-4">OPERATING HOURS</h3>
-          <div class="space-y-2">
-            {#each [
-              { days: 'Monday - Friday', hours: '5:00 AM - 11:00 PM' },
-              { days: 'Saturday', hours: '6:00 AM - 10:00 PM' },
-              { days: 'Sunday', hours: '7:00 AM - 9:00 PM' }
-            ] as schedule}
-              <div class="flex justify-between py-2 border-b border-gray-800/50 last:border-0">
-                <span class="text-gray-400">{schedule.days}</span>
-                <span class="font-bold text-white">{schedule.hours}</span>
-              </div>
-            {/each}
-            <p class="text-sm text-gray-500 mt-4">
-              * Elite members have 24/7 biometric access
-            </p>
-          </div>
+          <h3 class="font-black text-gym-red uppercase tracking-wider mb-4">WHY CHOOSE POWERZONE?</h3>
+          <ul class="space-y-3">
+            <li class="flex items-start gap-3">
+              <span class="text-gym-red mt-1">✓</span>
+              <span class="text-gray-300">No contracts or hidden fees</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-gym-red mt-1">✓</span>
+              <span class="text-gray-300">Friendly, supportive environment</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-gym-red mt-1">✓</span>
+              <span class="text-gray-300">Equipment for all fitness levels</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-gym-red mt-1">✓</span>
+              <span class="text-gray-300">Local community focused</span>
+            </li>
+          </ul>
         </div>
         
         <!-- Map Section -->
@@ -331,9 +333,10 @@
           <div class="absolute inset-0 bg-gray-900 flex items-center justify-center">
             <div class="text-center">
               <div class="text-6xl mb-4 animate-pulse">📍</div>
-              <p class="text-gray-400 mb-4">Interactive map loading...</p>
+              <p class="text-gray-400 mb-2 font-bold">POWERZONE GYM</p>
+              <p class="text-gray-500 text-sm mb-4">Purok Mulawin, Paltic, Dingalan, Aurora</p>
               <a 
-                href="https://maps.google.com"
+                href="https://maps.google.com/?q=Purok+Mulawin+Paltic+Dingalan+Aurora"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="inline-flex items-center gap-2 px-6 py-3 bg-gym-red/20 border border-gym-red/50 
@@ -364,37 +367,37 @@
   </div>
 </section>
 
-<!-- Social Proof Section -->
+<!-- Testimonials Section -->
 <section class="py-32 px-4 bg-gradient-to-b from-transparent via-black/50 to-transparent">
   <div class="container mx-auto max-w-7xl">
     <div class="text-center mb-16">
       <span class="inline-block px-4 py-1 bg-gym-red/20 border border-gym-red/50 rounded-full 
                    text-gym-red text-sm font-bold tracking-wider uppercase mb-6">
-        Testimonials
+        Community Voices
       </span>
       <h2 class="text-5xl md:text-6xl font-black">
-        TRANSFORMATION <span class="text-gym-red glow-text">STORIES</span>
+        WHAT OUR <span class="text-gym-red glow-text">MEMBERS SAY</span>
       </h2>
     </div>
     
     <div class="grid md:grid-cols-3 gap-8">
       {#each [
         {
-          name: 'Alex Chen',
-          role: 'Software Engineer',
-          text: 'Power Zone changed my life. Lost 30 pounds and gained confidence I never knew I had.',
+          name: 'Maria Santos',
+          role: 'Member since 2024',
+          text: 'PowerZone feels like family. Anthony and the team make everyone feel welcome!',
           rating: 5
         },
         {
-          name: 'Maria Rodriguez',
-          role: 'Marketing Director',
-          text: 'The trainers here are next level. They pushed me beyond what I thought was possible.',
+          name: 'Jose Reyes',
+          role: 'Founder Member',
+          text: 'Finally, a gym in Dingalan that understands what locals need. Simple and effective.',
           rating: 5
         },
         {
-          name: 'James Wilson',
-          role: 'Entrepreneur',
-          text: 'Best investment in myself. The facilities and community are absolutely unmatched.',
+          name: 'Ana Garcia',
+          role: 'Weekend Warrior',
+          text: 'Love the no-pressure environment. I can work out at my own pace without judgment.',
           rating: 5
         }
       ] as testimonial, i}
@@ -418,21 +421,21 @@
 </section>
 
 <!-- CTA Section -->
-<section class="py-32 px-4 relative overflow-hidden bg-black/90 text-white">
+<section class="py-32 px-4 relative overflow-hidden bg-black/90">
   <div class="absolute inset-0">
     <div class="absolute inset-0 bg-gradient-to-r from-gym-red/10 via-transparent to-gym-red/10"></div>
   </div>
   
   <div class="container mx-auto max-w-4xl text-center relative z-10">
     <h2 class="text-5xl md:text-6xl font-black mb-6">
-      NO MORE <span class="text-gym-red glitch">EXCUSES</span>
+      DON'T WAIT <span class="text-gym-red glitch">START TODAY</span>
     </h2>
     <p class="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-      Your transformation is one message away. Contact us now and take the first step.
+      Every journey begins with a single step. Take yours with PowerZone.
     </p>
     <div class="flex flex-col sm:flex-row gap-6 justify-center">
       <a 
-        href="tel:+15551234567"
+        href="tel:+639269228903"
         class="group relative px-10 py-4 bg-gym-red text-white font-black text-lg tracking-wider uppercase
                overflow-hidden transition-all duration-300 hover:shadow-[0_0_50px_rgba(220,38,38,0.7)]"
       >
@@ -441,12 +444,27 @@
                     group-hover:translate-x-0 transition-transform duration-300"></div>
       </a>
       <a 
-        href="#contact-form"
+        href="/membership"
         class="px-10 py-4 border-2 border-gym-red text-white font-black text-lg tracking-wider uppercase
                hover:bg-gym-red/10 transition-all duration-300"
       >
-        Message Us
+        View Plans
       </a>
+    </div>
+    
+    <!-- Contact Info Summary -->
+    <div class="mt-12 pt-8 border-t border-gray-800">
+      <div class="flex flex-col md:flex-row gap-6 justify-center items-center text-sm">
+        <span class="text-gray-400">📍 Purok Mulawin, Paltic, Dingalan</span>
+        <span class="hidden md:inline text-gray-600">•</span>
+        <a href="tel:+639269228903" class="text-gray-400 hover:text-gym-red transition-colors">
+          📞 +63 926 922 8903
+        </a>
+        <span class="hidden md:inline text-gray-600">•</span>
+        <a href="mailto:powerzone@gmail.com" class="text-gray-400 hover:text-gym-red transition-colors">
+          ✉️ powerzone@gmail.com
+        </a>
+      </div>
     </div>
   </div>
 </section>

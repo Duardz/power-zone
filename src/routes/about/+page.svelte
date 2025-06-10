@@ -9,11 +9,11 @@
 </script>
 
 <svelte:head>
-  <title>About Power Zone - Our Story & Mission</title>
+  <title>About PowerZone - Your Local Gym in Dingalan, Aurora</title>
 </svelte:head>
 
 <!-- Hero Section -->
-<section class="relative py-32 px-4 overflow-hidden">
+<section class="relative py-32 px-4 overflow-hidden bg-black/90">
   <!-- Animated background -->
   <div class="absolute inset-0">
     <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
@@ -31,13 +31,13 @@
   <div class="container mx-auto max-w-4xl text-center relative z-10">
     <div class="inline-block px-4 py-1 bg-gym-red/20 border border-gym-red/50 rounded-full 
                 text-gym-red text-sm font-bold tracking-wider uppercase mb-6 animate-slide-up">
-      EST. 2010
+      EST. 2024
     </div>
     <h1 class="text-6xl md:text-7xl font-black mb-6 animate-slide-up" style="animation-delay: 0.1s">
       OUR <span class="text-gym-red glow-text">STORY</span>
     </h1>
     <p class="text-xl text-gray-300 max-w-2xl mx-auto animate-slide-up" style="animation-delay: 0.2s">
-      From military training grounds to the future of fitness
+      The Real Ones Who Keep Things Running
     </p>
   </div>
   
@@ -47,7 +47,7 @@
 </section>
 
 <!-- Mission Section -->
-<section class="py-32 px-4 relative bg-black/90 overflow-hidden">
+<section class="py-32 px-4 relative bg-black/80">
   <div class="container mx-auto max-w-7xl">
     <div class="grid lg:grid-cols-2 gap-16 items-center">
       <div class="space-y-8 {mounted ? 'animate-slide-up' : ''}">
@@ -58,40 +58,37 @@
         </div>
         
         <h2 class="text-5xl md:text-6xl font-black leading-tight">
-          ENGINEERING <span class="text-gym-red glow-text">HUMAN</span>
+          BUILDING A <span class="text-gym-red glow-text">STRONGER</span>
           <br/>
-          <span class="text-3xl md:text-4xl text-gray-400">POTENTIAL</span>
+          <span class="text-3xl md:text-4xl text-gray-400">COMMUNITY</span>
         </h2>
         
         <div class="space-y-4 text-gray-300 text-lg">
           <p>
-            Power Zone was born from a simple observation: traditional gyms were failing to evolve. 
-            While technology revolutionized every aspect of our lives, fitness remained stuck in the past.
+            We're not pros. We're <strong>locals</strong> who just want to build a better, healthier community — one step at a time. 
+            At <strong>PowerZone</strong>, we believe fitness doesn't have to be fancy to be effective.
           </p>
           <p>
-            We created Power Zone to bridge that gap—combining cutting-edge technology with proven 
-            training methodologies to create an environment where limits are meant to be broken.
+            No complicated machines. No egos. Just real people trying to get stronger, together.
           </p>
         </div>
         
-        <div class="grid grid-cols-2 gap-4">
-          {#each [
-            { metric: '15+', label: 'Years of Innovation' },
-            { metric: '10K+', label: 'Lives Transformed' },
-            { metric: '98%', label: 'Success Rate' },
-            { metric: '24/7', label: 'Always Evolving' }
-          ] as stat, i}
-            <div class="futuristic-card p-6 border border-gray-800 hover:border-gym-red/50 
-                        transition-all duration-300 group {mounted ? 'animate-slide-up' : ''}"
-                 style="animation-delay: {0.3 + i * 0.1}s">
-              <div class="text-3xl font-black text-gym-red glow-text group-hover:scale-110 transition-transform">
-                {stat.metric}
-              </div>
-              <div class="text-sm text-gray-400 uppercase tracking-wider mt-2">
-                {stat.label}
-              </div>
+        <div class="space-y-4">
+          <h3 class="text-2xl font-black text-gym-red">OUR GOALS:</h3>
+          <div class="space-y-3">
+            <div class="flex items-center gap-3">
+              <span class="text-gym-red text-xl">🔹</span>
+              <span class="text-lg">Make fitness <strong>accessible</strong></span>
             </div>
-          {/each}
+            <div class="flex items-center gap-3">
+              <span class="text-gym-red text-xl">🔹</span>
+              <span class="text-lg">Keep things <strong>honest</strong></span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-gym-red text-xl">🔹</span>
+              <span class="text-lg">Grow stronger, <strong>as a community</strong></span>
+            </div>
+          </div>
         </div>
       </div>
       
@@ -99,7 +96,7 @@
         <div class="relative group">
           <img 
             src="https://images.unsplash.com/photo-1558611848-73f7eb4001a1?q=80&w=2071" 
-            alt="Gym Community" 
+            alt="PowerZone Community" 
             class="rounded-lg shadow-2xl group-hover:scale-105 transition-transform duration-700"
           />
           <!-- Overlay gradient -->
@@ -119,77 +116,8 @@
   </div>
 </section>
 
-<!-- Values Section -->
-<section class="py-32 px-4 bg-gradient-to-b from-transparent via-black/50 to-transparent relative overflow-hidden">
-  <!-- Background pattern -->
-  <div class="absolute inset-0 opacity-10">
-    <svg width="100%" height="100%">
-      <pattern id="hexagons-about" x="0" y="0" width="60" height="70" patternUnits="userSpaceOnUse">
-        <polygon points="30,5 55,22 55,48 30,65 5,48 5,22" fill="none" stroke="#DC2626" stroke-width="0.5"/>
-      </pattern>
-      <rect width="100%" height="100%" fill="url(#hexagons-about)" />
-    </svg>
-  </div>
-  
-  <div class="container mx-auto max-w-7xl relative z-10">
-    <div class="text-center mb-16">
-      <span class="inline-block px-4 py-1 bg-gym-red/20 border border-gym-red/50 rounded-full 
-                   text-gym-red text-sm font-bold tracking-wider uppercase mb-6">
-        Core Values
-      </span>
-      <h2 class="text-5xl md:text-6xl font-black">
-        THE <span class="text-gym-red glow-text">ZONE</span> PRINCIPLES
-      </h2>
-    </div>
-    
-    <div class="grid md:grid-cols-3 gap-8">
-      {#each [
-        { 
-          icon: '⚡', 
-          title: 'INTENSITY', 
-          desc: 'Every workout is designed to push boundaries. We don\'t do comfortable.',
-          gradient: 'from-red-600 to-orange-600'
-        },
-        { 
-          icon: '🧬', 
-          title: 'INNOVATION', 
-          desc: 'Constantly evolving with the latest in sports science and technology.',
-          gradient: 'from-red-600 to-pink-600'
-        },
-        { 
-          icon: '🎯', 
-          title: 'PRECISION', 
-          desc: 'Data-driven approach to fitness. Every rep counts, every metric matters.',
-          gradient: 'from-red-600 to-purple-600'
-        }
-      ] as value, i}
-        <div class="group relative {mounted ? 'animate-slide-up' : ''}" style="animation-delay: {0.1 * i}s">
-          <div class="futuristic-card p-8 border border-gray-800 hover:border-gym-red/50 
-                      transition-all duration-500 h-full">
-            <!-- Icon container -->
-            <div class="relative mb-6">
-              <div class="text-6xl group-hover:scale-125 transition-transform duration-300">
-                {value.icon}
-              </div>
-              <div class="absolute inset-0 bg-gradient-to-r {value.gradient} opacity-20 blur-xl 
-                          group-hover:opacity-40 transition-opacity"></div>
-            </div>
-            
-            <h3 class="text-2xl font-black mb-4 text-gym-red tracking-wider">{value.title}</h3>
-            <p class="text-gray-400 leading-relaxed">{value.desc}</p>
-            
-            <!-- Bottom accent -->
-            <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r {value.gradient} 
-                        transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
-          </div>
-        </div>
-      {/each}
-    </div>
-  </div>
-</section>
-
 <!-- Team Section -->
-<section class="py-32 px-4 relative bg-black/90 overflow-hidden">
+<section class="py-32 px-4 relative bg-black/90">
   <div class="container mx-auto max-w-7xl">
     <div class="text-center mb-16">
       <span class="inline-block px-4 py-1 bg-gym-red/20 border border-gym-red/50 rounded-full 
@@ -197,80 +125,71 @@
         Elite Squad
       </span>
       <h2 class="text-5xl md:text-6xl font-black">
-        THE <span class="text-gym-red glow-text">ARCHITECTS</span>
+        MEET THE <span class="text-gym-red glow-text">TEAM</span>
       </h2>
       <p class="text-gray-400 text-lg mt-4 max-w-2xl mx-auto">
-        Hand-picked experts who live and breathe transformation
+        We're not claiming to be experts — but we show up, and we're here to help.
       </p>
     </div>
     
-    <div class="grid md:grid-cols-3 gap-8">
-      {#each [
-        {
-          name: 'Marcus Johnson',
-          role: 'Founder & Head Architect',
-          image: 'https://images.unsplash.com/photo-1567013127542-490d757e51fc?q=80&w=1887',
-          specialties: ['Biomechanics', 'Neural Training', 'Strategic Planning'],
-          stats: { experience: '20+', clients: '1000+' }
-        },
-        {
-          name: 'Sarah Chen',
-          role: 'Performance Director',
-          image: 'https://images.unsplash.com/photo-1594381898411-846e7d193883?q=80&w=1887',
-          specialties: ['HIIT Programming', 'Metabolic Conditioning', 'Recovery Tech'],
-          stats: { experience: '10+', certifications: '15+' }
-        },
-        {
-          name: 'Mike Torres',
-          role: 'Strength Architect',
-          image: 'https://images.unsplash.com/photo-1534367610401-9f5ed68180aa?q=80&w=2070',
-          specialties: ['Powerlifting', 'Olympic Lifting', 'Strength Systems'],
-          stats: { experience: '15+', records: '5' }
-        }
-      ] as member, i}
-        <div class="group {mounted ? 'animate-slide-up' : ''}" style="animation-delay: {0.1 * i}s">
-          <div class="futuristic-card overflow-hidden border border-gray-800 hover:border-gym-red/50 
-                      transition-all duration-500">
+    <div class="max-w-4xl mx-auto">
+      <div class="group {mounted ? 'animate-slide-up' : ''}">
+        <div class="futuristic-card overflow-hidden border-2 border-gray-800 hover:border-gym-red/50 
+                    transition-all duration-500">
+          <div class="grid md:grid-cols-2 gap-8 items-center p-8">
             <!-- Image container -->
-            <div class="relative h-80 overflow-hidden">
+            <div class="relative h-96 overflow-hidden rounded-lg">
               <img 
-                src={member.image} 
-                alt={member.name} 
+                src="https://images.unsplash.com/photo-1567013127542-490d757e51fc?q=80&w=1887" 
+                alt="Anthony Cerenas" 
                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
               />
               <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
               
               <!-- Stats overlay -->
-              <div class="absolute bottom-4 left-4 right-4 flex gap-4">
-                {#each Object.entries(member.stats) as [key, value]}
-                  <div class="bg-black/80 backdrop-blur border border-gym-red/50 px-3 py-2 rounded">
-                    <p class="text-sm font-bold text-gym-red">{value}</p>
-                    <p class="text-xs uppercase tracking-wider text-gray-400">{key}</p>
+              <div class="absolute bottom-4 left-4 right-4">
+                <div class="bg-black/80 backdrop-blur border border-gym-red/50 p-4 rounded">
+                  <div class="flex items-center gap-4 text-sm">
+                    <span>📍 Dingalan Local</span>
+                    <span>|</span>
+                    <span>🏋️ Everyday Grind</span>
                   </div>
-                {/each}
+                </div>
               </div>
             </div>
             
             <!-- Content -->
-            <div class="p-6 space-y-4">
+            <div class="space-y-6">
               <div>
-                <h3 class="text-2xl font-black">{member.name}</h3>
-                <p class="text-gym-red font-bold tracking-wider uppercase text-sm">{member.role}</p>
+                <h3 class="text-3xl font-black mb-2">ANTHONY CERENAS</h3>
+                <p class="text-gym-red font-bold tracking-wider uppercase">Gym Staff & Community Motivator</p>
               </div>
               
-              <!-- Specialties -->
-              <div class="flex flex-wrap gap-2">
-                {#each member.specialties as specialty}
-                  <span class="px-3 py-1 bg-gym-red/10 border border-gym-red/30 rounded-full 
-                               text-xs text-gray-300 uppercase tracking-wider">
-                    {specialty}
+              <p class="text-gray-300 leading-relaxed">
+                Anthony is the heart of PowerZone. Not a certified trainer (yet!), but always there to help you settle in, 
+                stay consistent, and make your workouts count.
+              </p>
+              
+              <p class="text-gray-300 leading-relaxed">
+                Friendly, approachable, and committed to learning alongside our members.
+              </p>
+              
+              <!-- Contact -->
+              <div class="pt-4 border-t border-gray-800">
+                <p class="text-sm text-gray-400 mb-2">Need help? Find Anthony at:</p>
+                <div class="flex flex-col gap-2">
+                  <a href="tel:+639269228903" class="text-gym-red hover:text-white transition-colors">
+                    📞 +63 926 922 8903
+                  </a>
+                  <span class="text-gray-400">
+                    📍 PowerZone Gym, Purok Mulawin
                   </span>
-                {/each}
+                </div>
               </div>
             </div>
           </div>
         </div>
-      {/each}
+      </div>
     </div>
   </div>
 </section>
@@ -284,8 +203,9 @@
         Evolution
       </span>
       <h2 class="text-5xl md:text-6xl font-black">
-        THE <span class="text-gym-red glow-text">JOURNEY</span>
+        OUR <span class="text-gym-red glow-text">JOURNEY</span>
       </h2>
+      <p class="text-gray-400 text-lg mt-4">Just Getting Started</p>
     </div>
     
     <div class="relative">
@@ -294,10 +214,21 @@
       
       <!-- Timeline items -->
       {#each [
-        { year: '2010', title: 'Genesis', desc: 'Power Zone opens with a vision to revolutionize fitness' },
-        { year: '2015', title: 'Expansion', desc: 'Introduction of AI-powered training systems' },
-        { year: '2020', title: 'Innovation', desc: 'Launch of biometric tracking and recovery tech' },
-        { year: '2025', title: 'Evolution', desc: 'Leading the future of human performance optimization' }
+        { 
+          year: '2024', 
+          title: 'Stepping In the Zone', 
+          desc: 'PowerZone Gym opens its doors with humble equipment and a big goal: help locals take charge of their health.' 
+        },
+        { 
+          year: '2025', 
+          title: 'Community First', 
+          desc: 'We start building our loyal fitness family. Free orientations, flexible memberships, and simple but consistent service.' 
+        },
+        { 
+          year: 'Future', 
+          title: 'Step by Step, We Grow', 
+          desc: 'More equipment. Better training. Real transformation. And maybe, someday — full-time pros.' 
+        }
       ] as item, i}
         <div class="relative flex items-center justify-center mb-16 {mounted ? 'animate-slide-up' : ''}" 
              style="animation-delay: {0.1 * i}s">
@@ -317,16 +248,46 @@
   </div>
 </section>
 
+<!-- Contact Info Section -->
+<section class="py-20 px-4 bg-black/90">
+  <div class="container mx-auto max-w-4xl">
+    <div class="futuristic-card p-8 border-2 border-gray-800 text-center">
+      <h3 class="text-2xl font-black mb-6 text-gym-red">FIND US</h3>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div>
+          <p class="text-3xl mb-2">📍</p>
+          <p class="font-bold">Location</p>
+          <p class="text-gray-400 text-sm">Purok Mulawin, Paltic, Dingalan, Aurora</p>
+        </div>
+        <div>
+          <p class="text-3xl mb-2">📞</p>
+          <p class="font-bold">Phone</p>
+          <a href="tel:+639269228903" class="text-gray-400 hover:text-gym-red text-sm transition-colors">
+            +63 926 922 8903
+          </a>
+        </div>
+        <div>
+          <p class="text-3xl mb-2">✉️</p>
+          <p class="font-bold">Email</p>
+          <a href="mailto:powerzone@gmail.com" class="text-gray-400 hover:text-gym-red text-sm transition-colors">
+            powerzone@gmail.com
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- CTA Section -->
-<section class="py-32 px-4 relative overflow-hidden">
+<section class="py-32 px-4 relative overflow-hidden bg-black/80">
   <div class="absolute inset-0 bg-gradient-to-r from-gym-red/20 via-black to-gym-red/20"></div>
   
   <div class="container mx-auto max-w-4xl text-center relative z-10">
     <h2 class="text-5xl md:text-6xl font-black mb-6">
-      READY TO JOIN THE <span class="text-gym-red glitch">REVOLUTION?</span>
+      COME STEP INTO THE <span class="text-gym-red glitch">ZONE</span>
     </h2>
     <p class="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-      Step into the future of fitness. Your transformation starts now.
+      Where every rep counts and every effort matters.
     </p>
     <div class="flex flex-col sm:flex-row gap-6 justify-center">
       <a 
@@ -334,7 +295,7 @@
         class="group relative px-10 py-4 bg-gym-red text-white font-black text-lg tracking-wider uppercase
                overflow-hidden transition-all duration-300 hover:shadow-[0_0_50px_rgba(220,38,38,0.7)]"
       >
-        <span class="relative z-10">View Memberships</span>
+        <span class="relative z-10">Join Now</span>
         <div class="absolute inset-0 bg-gradient-to-r from-red-600 to-red-800 translate-x-full 
                     group-hover:translate-x-0 transition-transform duration-300"></div>
       </a>

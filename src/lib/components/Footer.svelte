@@ -17,24 +17,14 @@
           <span class="text-2xl font-black text-gym-red glow-text">POWER</span>
           <span class="text-2xl font-black text-white">ZONE</span>
         </div>
-        <p class="text-gray-400 leading-relaxed">
-          Transform your body, elevate your mind. Join the zone.
+        <p class="text-gray-400 leading-relaxed mb-4">
+          Your local fitness family in Dingalan, Aurora. Come step into the zone — where every rep counts and every effort matters.
         </p>
-        <div class="flex gap-3 mt-4">
-          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" 
+        <div class="flex gap-3">
+          <a href="https://facebook.com/powerzonegym" target="_blank" rel="noopener noreferrer" 
              class="w-10 h-10 bg-gray-900 border border-gray-800 rounded flex items-center justify-center
                     hover:bg-gym-red hover:border-gym-red transition-all duration-300 group">
             <span class="text-gray-400 group-hover:text-white">f</span>
-          </a>
-          <a href="https://x.com" target="_blank" rel="noopener noreferrer"
-             class="w-10 h-10 bg-gray-900 border border-gray-800 rounded flex items-center justify-center
-                    hover:bg-gym-red hover:border-gym-red transition-all duration-300 group">
-            <span class="text-gray-400 group-hover:text-white">X</span>
-          </a>
-          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"
-             class="w-10 h-10 bg-gray-900 border border-gray-800 rounded flex items-center justify-center
-                    hover:bg-gym-red hover:border-gym-red transition-all duration-300 group">
-            <span class="text-gray-400 group-hover:text-white">ig</span>
           </a>
         </div>
       </div>
@@ -52,13 +42,13 @@
           <li>
             <a href="/membership" class="text-gray-400 hover:text-gym-red transition-colors inline-flex items-center gap-2 group">
               <span class="text-gym-red opacity-0 group-hover:opacity-100 transition-opacity">→</span>
-              Membership
+              Membership Plans
             </a>
           </li>
           <li>
             <a href="/contact" class="text-gray-400 hover:text-gym-red transition-colors inline-flex items-center gap-2 group">
               <span class="text-gym-red opacity-0 group-hover:opacity-100 transition-opacity">→</span>
-              Contact
+              Contact & Location
             </a>
           </li>
         </ul>
@@ -66,30 +56,38 @@
       
       <!-- Contact Info -->
       <div>
-        <h3 class="font-bold text-gym-red mb-4 tracking-wider uppercase">Contact</h3>
+        <h3 class="font-bold text-gym-red mb-4 tracking-wider uppercase">Find Us</h3>
         <ul class="space-y-3 text-gray-400">
           <li class="flex items-start gap-3">
             <span class="text-gym-red mt-0.5">📍</span>
-            <span>123 Fitness Street, Gym City</span>
+            <span>Purok Mulawin, Paltic<br/>Dingalan, Aurora</span>
           </li>
           <li class="flex items-center gap-3">
             <span class="text-gym-red">📞</span>
-            <span>(555) 123-4567</span>
+            <a href="tel:+639269228903" class="hover:text-gym-red transition-colors">
+              +63 926 922 8903
+            </a>
           </li>
           <li class="flex items-center gap-3">
             <span class="text-gym-red">✉️</span>
-            <span>info@powerzone.gym</span>
+            <a href="mailto:powerzone@gmail.com" class="hover:text-gym-red transition-colors">
+              powerzone@gmail.com
+            </a>
           </li>
         </ul>
+        
+        <div class="mt-6 p-3 bg-gray-900 rounded-lg border border-gray-800">
+          <p class="text-xs text-gray-500">Open 7 days a week</p>
+          <p class="text-sm font-bold text-gray-300">Call for current hours</p>
+        </div>
       </div>
     </div>
     
     <div class="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-      <p class="text-gray-500 text-sm">&copy; 2025 Power Zone Gym. All rights reserved.</p>
-      <div class="flex gap-6 mt-4 md:mt-0">
-        <a href="/privacy" class="text-gray-500 hover:text-gym-red text-sm transition-colors">Privacy Policy</a>
-        <a href="/terms" class="text-gray-500 hover:text-gym-red text-sm transition-colors">Terms of Service</a>
-      </div>
+      <p class="text-gray-500 text-sm">&copy; 2024-2025 PowerZone Gym. All rights reserved.</p>
+      <p class="text-gray-600 text-xs mt-4 md:mt-0">
+        Proudly serving the Dingalan community
+      </p>
     </div>
   </div>
 </footer>

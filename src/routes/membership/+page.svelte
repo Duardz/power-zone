@@ -2,7 +2,7 @@
   import { onMount } from 'svelte';
   
   let mounted = false;
-  let selectedPlan = 'Pro';
+  let selectedPlan = 'Regular';
   
   onMount(() => {
     mounted = true;
@@ -11,62 +11,55 @@
   const membershipPlans = [
     {
       name: 'Basic',
-      tagline: 'ENTRY LEVEL',
-      price: '$29',
+      tagline: 'GET STARTED',
+      price: '₱399',
       period: 'per month',
+      icon: '🔓',
       features: [
-        'Access to gym equipment',
-        'Digital workout tracking',
-        'Locker room access',
-        'Mobile app access',
-        'Basic progress analytics'
+        'Unlimited gym access',
+        'Use of all equipment',
+        'Orientation on first visit',
+        'Bring your own towel & bottle'
       ],
       notIncluded: [
-        'Personal training',
-        'Group classes',
-        'Recovery tech',
-        'Nutrition planning'
+        'Progress check-ins',
+        'Guest passes',
+        'Weekend bootcamps'
       ],
       gradient: 'from-gray-600 to-gray-800',
       highlighted: false
     },
     {
-      name: 'Pro',
+      name: 'Regular',
       tagline: 'MOST POPULAR',
-      price: '$59',
+      price: '₱599',
       period: 'per month',
+      icon: '✅',
       features: [
         'Everything in Basic',
-        'Unlimited group classes',
-        '2 personal training sessions/month',
-        'AI-powered workout plans',
-        'Nutrition consultation',
-        'Priority equipment booking',
-        'Body composition analysis',
-        'Recovery zone access'
+        '1 Progress Check-in per month',
+        'Invite a friend (1 free pass/month)',
+        'Access to special weekend bootcamps (coming soon)'
       ],
       notIncluded: [
-        'Unlimited PT sessions',
-        'Custom meal plans'
+        'Lifetime locked-in rate',
+        'Founders Wall recognition'
       ],
       gradient: 'from-red-600 to-red-800',
       highlighted: true
     },
     {
-      name: 'Elite',
-      tagline: 'ULTIMATE TRANSFORMATION',
-      price: '$99',
+      name: 'PowerZone Founder',
+      tagline: 'LIFETIME MEMBER',
+      price: '₱799',
       period: 'per month',
+      icon: '🔥',
       features: [
-        'Everything in Pro',
-        'Unlimited personal training',
-        'Custom meal plans & tracking',
-        'Weekly body composition scans',
-        'Priority 24/7 gym access',
-        'Guest passes (2/month)',
-        'Exclusive masterclasses',
-        'Dedicated performance coach',
-        'VIP locker & amenities'
+        'Everything in Regular',
+        'Lifetime locked-in rate',
+        'Your name on our "Founders Wall"',
+        'Priority for future upgrades',
+        'Help shape the gym\'s future through feedback'
       ],
       notIncluded: [],
       gradient: 'from-purple-600 to-pink-600',
@@ -76,11 +69,11 @@
 </script>
 
 <svelte:head>
-  <title>Membership Plans - Power Zone Gym</title>
+  <title>Membership Plans - PowerZone Gym Dingalan</title>
 </svelte:head>
 
 <!-- Hero Section -->
-<section class="relative py-32 px-4 overflow-hidden">
+<section class="relative py-32 px-4 overflow-hidden bg-black/90">
   <!-- Animated background -->
   <div class="absolute inset-0">
     <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
@@ -114,19 +107,90 @@
   <div class="container mx-auto max-w-6xl text-center relative z-10">
     <div class="inline-block px-4 py-1 bg-gym-red/20 border border-gym-red/50 rounded-full 
                 text-gym-red text-sm font-bold tracking-wider uppercase mb-6 animate-slide-up">
-      Level Up
+      Simple & Honest Pricing
     </div>
     <h1 class="text-6xl md:text-7xl font-black mb-6 animate-slide-up" style="animation-delay: 0.1s">
-      CHOOSE YOUR <span class="text-gym-red glow-text glitch">POWER</span>
+      CHOOSE YOUR <span class="text-gym-red glow-text glitch">PLAN</span>
     </h1>
     <p class="text-xl text-gray-300 max-w-3xl mx-auto animate-slide-up" style="animation-delay: 0.2s">
-      Select your transformation tier. Each level unlocks new possibilities for your evolution.
+      No contracts. No hidden fees. Just straightforward membership options for our community.
     </p>
   </div>
 </section>
 
+<!-- What's Included Section -->
+<section class="py-20 px-4 bg-black/80">
+  <div class="container mx-auto max-w-7xl">
+    <div class="text-center mb-12">
+      <span class="inline-block px-4 py-1 bg-gym-red/20 border border-gym-red/50 rounded-full 
+                   text-gym-red text-sm font-bold tracking-wider uppercase mb-6">
+        All Plans Include
+      </span>
+      <h2 class="text-4xl md:text-5xl font-black">
+        EVERY MEMBERSHIP <span class="text-gym-red glow-text">INCLUDES</span>
+      </h2>
+    </div>
+    
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+      {#each [
+        { 
+          icon: '🏋️', 
+          title: 'Full Equipment Access', 
+          desc: 'Use everything we have, no hidden restrictions'
+        },
+        { 
+          icon: '🧍‍♂️', 
+          title: 'Basic Guidance', 
+          desc: 'Ask Anthony for help with equipment or beginner tips'
+        },
+        { 
+          icon: '💦', 
+          title: 'Free Water Refill Station', 
+          desc: 'Stay hydrated anytime'
+        },
+        { 
+          icon: '📆', 
+          title: 'Progress Check-ins', 
+          desc: 'Monthly casual progress talks or weight checks'
+        },
+        { 
+          icon: '👥', 
+          title: 'Supportive Community', 
+          desc: 'A place where everyone starts somewhere'
+        },
+        { 
+          icon: '📸', 
+          title: 'Gym Wall of Fame', 
+          desc: 'Be part of our growth and history'
+        },
+        { 
+          icon: '🧍‍♀️', 
+          title: 'No Pressure Vibe', 
+          desc: 'Come as you are, train at your pace'
+        },
+        { 
+          icon: '🎯', 
+          title: 'Flexible Hours', 
+          desc: 'Train when it works for you'
+        }
+      ] as feature}
+        <div class="group {mounted ? 'animate-slide-up' : ''}">
+          <div class="futuristic-card h-full p-6 border border-gray-800 hover:border-gym-red/50 
+                      transition-all duration-500 text-center">
+            <div class="text-5xl mb-4 group-hover:scale-125 transition-transform duration-300">
+              {feature.icon}
+            </div>
+            <h3 class="text-lg font-black text-gym-red mb-2 tracking-wider">{feature.title}</h3>
+            <p class="text-sm text-gray-400 leading-relaxed">{feature.desc}</p>
+          </div>
+        </div>
+      {/each}
+    </div>
+  </div>
+</section>
+
 <!-- Pricing Cards -->
-<section class="py-20 px-4 relative bg-black/80">
+<section class="py-20 px-4 relative bg-black/90">
   <div class="container mx-auto max-w-7xl">
     <!-- Plan selector (mobile) -->
     <div class="md:hidden mb-8">
@@ -139,7 +203,7 @@
                      ? 'bg-gym-red text-white' 
                      : 'text-gray-400 hover:text-white'}"
           >
-            {plan.name}
+            {plan.icon}
           </button>
         {/each}
       </div>
@@ -165,6 +229,7 @@
               <div class="absolute inset-0 bg-gradient-to-br {plan.gradient} opacity-10"></div>
               
               <div class="relative">
+                <div class="text-6xl mb-4">{plan.icon}</div>
                 <span class="text-xs font-bold tracking-wider text-gray-400 uppercase">
                   {plan.tagline}
                 </span>
@@ -217,7 +282,7 @@
                          : 'bg-gray-800 hover:bg-gym-red'}"
               >
                 <span class="relative z-10">
-                  {plan.highlighted ? 'Start Now' : 'Select Plan'}
+                  {plan.highlighted ? 'Get Started' : 'Choose Plan'}
                 </span>
                 <div class="absolute inset-0 bg-gradient-to-r {plan.gradient} 
                             translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></div>
@@ -245,6 +310,7 @@
             <div class="p-8 text-center border-b border-gray-800 relative">
               <div class="absolute inset-0 bg-gradient-to-br {plan.gradient} opacity-10"></div>
               <div class="relative">
+                <div class="text-6xl mb-4">{plan.icon}</div>
                 <span class="text-xs font-bold tracking-wider text-gray-400 uppercase">
                   {plan.tagline}
                 </span>
@@ -276,7 +342,7 @@
                 class="block text-center py-4 bg-gym-red rounded-lg font-black uppercase tracking-wider
                        hover:shadow-[0_0_30px_rgba(220,38,38,0.5)] transition-all duration-300"
               >
-                Start Now
+                Get Started
               </a>
             </div>
           </div>
@@ -286,180 +352,13 @@
   </div>
 </section>
 
-<!-- Features Grid -->
-<section class="py-32 px-4 bg-gradient-to-b from-transparent via-black/50 to-transparent bg-black/90">
-  <div class="container mx-auto max-w-7xl">
-    <div class="text-center mb-16">
-      <span class="inline-block px-4 py-1 bg-gym-red/20 border border-gym-red/50 rounded-full 
-                   text-gym-red text-sm font-bold tracking-wider uppercase mb-6">
-        All Access
-      </span>
-      <h2 class="text-5xl md:text-6xl font-black">
-        EVERY MEMBERSHIP <span class="text-gym-red glow-text">INCLUDES</span>
-      </h2>
-    </div>
-    
-    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {#each [
-        { 
-          icon: '🏋️', 
-          title: 'QUANTUM EQUIPMENT', 
-          desc: 'Next-gen machines that adapt to your strength curve in real-time',
-          delay: '0s'
-        },
-        { 
-          icon: '📊', 
-          title: 'BIOMETRIC TRACKING', 
-          desc: 'Monitor heart rate, calories, and performance metrics live',
-          delay: '0.1s'
-        },
-        { 
-          icon: '🚿', 
-          title: 'LUXURY FACILITIES', 
-          desc: 'Premium locker rooms with aromatherapy and rain showers',
-          delay: '0.2s'
-        },
-        { 
-          icon: '📱', 
-          title: 'ZONE APP', 
-          desc: 'Track workouts, book sessions, and connect with the community',
-          delay: '0.3s'
-        },
-        { 
-          icon: '🧘', 
-          title: 'RECOVERY LOUNGE', 
-          desc: 'Meditation pods and stretching zones for optimal recovery',
-          delay: '0.4s'
-        },
-        { 
-          icon: '🎯', 
-          title: 'GOAL TRACKING', 
-          desc: 'AI-powered progress monitoring and milestone celebrations',
-          delay: '0.5s'
-        },
-        { 
-          icon: '👥', 
-          title: 'COMMUNITY EVENTS', 
-          desc: 'Monthly challenges, workshops, and member socials',
-          delay: '0.6s'
-        },
-        { 
-          icon: '🏆', 
-          title: 'REWARDS PROGRAM', 
-          desc: 'Earn points for consistency and unlock exclusive perks',
-          delay: '0.7s'
-        }
-      ] as feature}
-        <div class="group {mounted ? 'animate-slide-up' : ''}" style="animation-delay: {feature.delay}">
-          <div class="futuristic-card h-full p-6 border border-gray-800 hover:border-gym-red/50 
-                      transition-all duration-500 text-center">
-            <div class="text-5xl mb-4 group-hover:scale-125 transition-transform duration-300">
-              {feature.icon}
-            </div>
-            <h3 class="text-lg font-black text-gym-red mb-2 tracking-wider">{feature.title}</h3>
-            <p class="text-sm text-gray-400 leading-relaxed">{feature.desc}</p>
-          </div>
-        </div>
-      {/each}
-    </div>
-  </div>
-</section>
-
-<!-- Comparison Table -->
-<section class="py-32 px-4 bg-black/90 relative overflow-hidden">
-  <div class="container mx-auto max-w-6xl">
-    <div class="text-center mb-16">
-      <span class="inline-block px-4 py-1 bg-gym-red/20 border border-gym-red/50 rounded-full 
-                   text-gym-red text-sm font-bold tracking-wider uppercase mb-6">
-        Compare
-      </span>
-      <h2 class="text-5xl md:text-6xl font-black">
-        FEATURE <span class="text-gym-red glow-text">MATRIX</span>
-      </h2>
-    </div>
-    
-    <div class="overflow-x-auto">
-      <table class="w-full">
-        <thead>
-          <tr class="border-b border-gray-800">
-            <th class="text-left py-4 px-6 font-black uppercase tracking-wider">Features</th>
-            <th class="text-center py-4 px-6 font-black uppercase tracking-wider text-gray-400">Basic</th>
-            <th class="text-center py-4 px-6 font-black uppercase tracking-wider text-gym-red">Pro</th>
-            <th class="text-center py-4 px-6 font-black uppercase tracking-wider text-purple-500">Elite</th>
-          </tr>
-        </thead>
-        <tbody>
-          {#each [
-            { feature: 'Equipment Access', basic: true, pro: true, elite: true },
-            { feature: 'Mobile App', basic: true, pro: true, elite: true },
-            { feature: 'Progress Tracking', basic: true, pro: true, elite: true },
-            { feature: 'Group Classes', basic: false, pro: true, elite: true },
-            { feature: 'Personal Training', basic: false, pro: '2/month', elite: 'Unlimited' },
-            { feature: 'Nutrition Plans', basic: false, pro: 'Basic', elite: 'Custom' },
-            { feature: 'Recovery Tech', basic: false, pro: true, elite: true },
-            { feature: '24/7 Access', basic: false, pro: false, elite: true },
-            { feature: 'Guest Passes', basic: false, pro: false, elite: '2/month' },
-            { feature: 'VIP Amenities', basic: false, pro: false, elite: true }
-          ] as row}
-            <tr class="border-b border-gray-800/50 hover:bg-gray-900/50 transition-colors">
-              <td class="py-4 px-6 font-medium">{row.feature}</td>
-              <td class="py-4 px-6 text-center">
-                {#if typeof row.basic === 'boolean'}
-                  {#if row.basic}
-                    <div class="w-6 h-6 rounded-full bg-green-500/20 border border-green-500/50 
-                                flex items-center justify-center mx-auto">
-                      <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                    </div>
-                  {:else}
-                    <span class="text-gray-600">—</span>
-                  {/if}
-                {:else}
-                  <span class="text-gray-400">{row.basic}</span>
-                {/if}
-              </td>
-              <td class="py-4 px-6 text-center">
-                {#if typeof row.pro === 'boolean'}
-                  {#if row.pro}
-                    <div class="w-6 h-6 rounded-full bg-gym-red/20 border border-gym-red/50 
-                                flex items-center justify-center mx-auto">
-                      <div class="w-2 h-2 bg-gym-red rounded-full"></div>
-                    </div>
-                  {:else}
-                    <span class="text-gray-600">—</span>
-                  {/if}
-                {:else}
-                  <span class="text-gym-red font-bold">{row.pro}</span>
-                {/if}
-              </td>
-              <td class="py-4 px-6 text-center">
-                {#if typeof row.elite === 'boolean'}
-                  {#if row.elite}
-                    <div class="w-6 h-6 rounded-full bg-purple-500/20 border border-purple-500/50 
-                                flex items-center justify-center mx-auto">
-                      <div class="w-2 h-2 bg-purple-500 rounded-full"></div>
-                    </div>
-                  {:else}
-                    <span class="text-gray-600">—</span>
-                  {/if}
-                {:else}
-                  <span class="text-purple-500 font-bold">{row.elite}</span>
-                {/if}
-              </td>
-            </tr>
-          {/each}
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
 <!-- FAQ Section -->
-<section class="py-32 px-4 bg-black/50">
+<section class="py-32 px-4 bg-black/80">
   <div class="container mx-auto max-w-4xl">
     <div class="text-center mb-16">
       <span class="inline-block px-4 py-1 bg-gym-red/20 border border-gym-red/50 rounded-full 
                    text-gym-red text-sm font-bold tracking-wider uppercase mb-6">
-        Intel
+        Questions?
       </span>
       <h2 class="text-5xl md:text-6xl font-black">
         FREQUENTLY ASKED <span class="text-gym-red glow-text">QUESTIONS</span>
@@ -469,20 +368,24 @@
     <div class="space-y-4">
       {#each [
         { 
-          q: 'Can I switch between membership tiers?', 
-          a: 'Absolutely. Upgrade anytime and get instant access to new features. Downgrades take effect at the next billing cycle.' 
+          q: 'Can I switch between membership plans?', 
+          a: 'Yes! You can upgrade anytime and the new rate applies immediately. For downgrades, just let us know before your next billing date.' 
         },
         { 
-          q: 'Is there a contract or commitment?', 
-          a: 'No contracts. All memberships are month-to-month. Cancel anytime with no penalties.' 
+          q: 'Is there a contract or joining fee?', 
+          a: 'No contracts and no joining fees! We keep it simple - pay monthly, cancel anytime.' 
         },
         { 
-          q: 'Do you offer student or corporate discounts?', 
-          a: 'Yes! Students get 20% off with valid ID. Corporate packages available for teams of 5+.' 
+          q: 'What should I bring on my first visit?', 
+          a: 'Just bring a towel, water bottle, and your positive energy! We\'ll handle the orientation.' 
         },
         { 
           q: 'What are your operating hours?', 
-          a: 'Basic and Pro members: 5 AM - 11 PM daily. Elite members get 24/7 access with biometric entry.' 
+          a: 'We\'re open 7 days a week! Call us at +63 926 922 8903 for current hours.' 
+        },
+        { 
+          q: 'Do you offer day passes?', 
+          a: 'Yes! Contact us for day pass rates. Regular members also get 1 free guest pass per month.' 
         }
       ] as faq, i}
         <div class="futuristic-card p-6 border border-gray-800 hover:border-gym-red/50 
@@ -497,17 +400,17 @@
 </section>
 
 <!-- CTA Section -->
-<section class="py-32 px-4 bg-black/88 relative overflow-hidden">
+<section class="py-32 px-4 relative overflow-hidden bg-black/90">
   <div class="absolute inset-0">
     <div class="absolute inset-0 bg-gradient-to-r from-gym-red/20 via-transparent to-gym-red/20"></div>
   </div>
   
   <div class="container mx-auto max-w-4xl text-center relative z-10">
     <h2 class="text-5xl md:text-6xl font-black mb-6">
-      READY TO <span class="text-gym-red glitch">POWER UP?</span>
+      START YOUR <span class="text-gym-red glitch">JOURNEY</span>
     </h2>
     <p class="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-      Join thousands who've already transformed their lives. Your journey to peak performance starts here.
+      Join our growing fitness family today. No excuses, just results.
     </p>
     <div class="flex flex-col sm:flex-row gap-6 justify-center">
       <a 
@@ -515,16 +418,16 @@
         class="group relative px-10 py-4 bg-gym-red text-white font-black text-lg tracking-wider uppercase
                overflow-hidden transition-all duration-300 hover:shadow-[0_0_50px_rgba(220,38,38,0.7)]"
       >
-        <span class="relative z-10">Start Free Trial</span>
+        <span class="relative z-10">Sign Up Now</span>
         <div class="absolute inset-0 bg-gradient-to-r from-red-600 to-red-800 translate-x-full 
                     group-hover:translate-x-0 transition-transform duration-300"></div>
       </a>
       <a 
-        href="/contact" 
+        href="tel:+639269228903" 
         class="px-10 py-4 border-2 border-gym-red text-white font-black text-lg tracking-wider uppercase
                hover:bg-gym-red/10 transition-all duration-300"
       >
-        Schedule Tour
+        Call Us
       </a>
     </div>
   </div>
