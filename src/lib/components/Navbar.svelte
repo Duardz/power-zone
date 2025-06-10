@@ -98,13 +98,7 @@
             {link.label}
           </a>
         {/each}
-        <a 
-          href="/admin/login" 
-          class="block py-3 px-4 mt-4 bg-gym-red/10 border border-gym-red/50
-                 hover:bg-gym-red text-gray-300 hover:text-white font-bold tracking-wider transition-all duration-300"
-        >
-          ADMIN ACCESS
-        </a>
+       
       </div>
     </div>
   </div>
