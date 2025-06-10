@@ -126,7 +126,7 @@
 </section>
 
 <!-- Pricing Cards -->
-<section class="py-20 px-4 relative">
+<section class="py-20 px-4 relative bg-black/80">
   <div class="container mx-auto max-w-7xl">
     <!-- Plan selector (mobile) -->
     <div class="md:hidden mb-8">
@@ -287,7 +287,7 @@
 </section>
 
 <!-- Features Grid -->
-<section class="py-32 px-4 bg-gradient-to-b from-transparent via-black/50 to-transparent">
+<section class="py-32 px-4 bg-gradient-to-b from-transparent via-black/50 to-transparent bg-black/90">
   <div class="container mx-auto max-w-7xl">
     <div class="text-center mb-16">
       <span class="inline-block px-4 py-1 bg-gym-red/20 border border-gym-red/50 rounded-full 
@@ -366,7 +366,7 @@
 </section>
 
 <!-- Comparison Table -->
-<section class="py-32 px-4 relative overflow-hidden">
+<section class="py-32 px-4 bg-black/90 relative overflow-hidden">
   <div class="container mx-auto max-w-6xl">
     <div class="text-center mb-16">
       <span class="inline-block px-4 py-1 bg-gym-red/20 border border-gym-red/50 rounded-full 
@@ -497,7 +497,7 @@
 </section>
 
 <!-- CTA Section -->
-<section class="py-32 px-4 relative overflow-hidden">
+<section class="py-32 px-4 bg-black/88 relative overflow-hidden">
   <div class="absolute inset-0">
     <div class="absolute inset-0 bg-gradient-to-r from-gym-red/20 via-transparent to-gym-red/20"></div>
   </div>
