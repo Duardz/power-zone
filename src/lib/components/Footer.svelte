@@ -21,16 +21,19 @@
           Transform your body, elevate your mind. Join the zone.
         </p>
         <div class="flex gap-3 mt-4">
-          <a href="#" class="w-10 h-10 bg-gray-900 border border-gray-800 rounded flex items-center justify-center
-                             hover:bg-gym-red hover:border-gym-red transition-all duration-300 group">
+          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" 
+             class="w-10 h-10 bg-gray-900 border border-gray-800 rounded flex items-center justify-center
+                    hover:bg-gym-red hover:border-gym-red transition-all duration-300 group">
             <span class="text-gray-400 group-hover:text-white">f</span>
           </a>
-          <a href="#" class="w-10 h-10 bg-gray-900 border border-gray-800 rounded flex items-center justify-center
-                             hover:bg-gym-red hover:border-gym-red transition-all duration-300 group">
+          <a href="https://x.com" target="_blank" rel="noopener noreferrer"
+             class="w-10 h-10 bg-gray-900 border border-gray-800 rounded flex items-center justify-center
+                    hover:bg-gym-red hover:border-gym-red transition-all duration-300 group">
             <span class="text-gray-400 group-hover:text-white">X</span>
           </a>
-          <a href="#" class="w-10 h-10 bg-gray-900 border border-gray-800 rounded flex items-center justify-center
-                             hover:bg-gym-red hover:border-gym-red transition-all duration-300 group">
+          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"
+             class="w-10 h-10 bg-gray-900 border border-gray-800 rounded flex items-center justify-center
+                    hover:bg-gym-red hover:border-gym-red transition-all duration-300 group">
             <span class="text-gray-400 group-hover:text-white">ig</span>
           </a>
         </div>
