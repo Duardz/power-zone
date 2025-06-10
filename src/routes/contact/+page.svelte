@@ -418,7 +418,7 @@
 </section>
 
 <!-- CTA Section -->
-<section class="py-32 px-4 relative overflow-hidden">
+<section class="py-32 px-4 relative overflow-hidden bg-black/90 text-white">
   <div class="absolute inset-0">
     <div class="absolute inset-0 bg-gradient-to-r from-gym-red/10 via-transparent to-gym-red/10"></div>
   </div>
