@@ -1,9 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
-  import { signOut } from 'firebase/auth';
-  import { collection, query, orderBy, getDocs, deleteDoc, doc, addDoc, updateDoc } from 'firebase/firestore';
-  import { auth, db } from '$lib/firebase';
+  import { signOut, onAuthStateChanged, type User } from 'firebase/auth';
+  import { collection, query, orderBy, getDocs, deleteDoc, doc, addDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+  import { isFirebaseReady, getFirebaseAuth, getFirebaseDb } from '$lib/firebase';
   import PostCard from '$lib/components/PostCard.svelte';
   import AdminPostForm from '$lib/components/AdminPostForm.svelte';
   import DashboardOverview from '$lib/components/DashboardOverview.svelte';
@@ -16,13 +16,21 @@
   let editingPost: Post | null = null;
   let activeTab = 'overview';
   let mounted = false;
-  let currentUser: any = null;
+  let currentUser: User | null = null;
   
   onMount(() => {
     mounted = true;
     
+    if (!isFirebaseReady()) {
+      console.error('Firebase not initialized');
+      goto('/admin/login');
+      return;
+    }
+    
+    const auth = getFirebaseAuth();
+    
     // Check authentication
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (!user) {
         goto('/admin/login');
         return;
@@ -36,7 +44,14 @@
   });
   
   async function loadData() {
+    if (!isFirebaseReady()) {
+      isLoading = false;
+      return;
+    }
+    
     try {
+      const db = getFirebaseDb();
+      
       // Load posts
       const postsQuery = query(collection(db, 'posts'), orderBy('date', 'desc'));
       const postsSnapshot = await getDocs(postsQuery);
@@ -44,8 +59,8 @@
         const data = doc.data();
         return {
           id: doc.id,
-          title: data.title,
-          content: data.content,
+          title: data.title || 'Untitled',
+          content: data.content || '',
           imageURL: data.imageURL,
           date: data.date?.toDate ? data.date.toDate() : new Date(data.date)
         } as Post;
@@ -58,11 +73,11 @@
         const data = doc.data();
         return {
           id: doc.id,
-          name: data.name,
-          email: data.email,
+          name: data.name || 'Anonymous',
+          email: data.email || '',
           phone: data.phone,
-          message: data.message,
-          interest: data.interest,
+          message: data.message || '',
+          interest: data.interest || 'general',
           timestamp: data.timestamp?.toDate ? data.timestamp.toDate() : new Date(data.timestamp),
           read: data.read || false
         } as ContactMessage;
@@ -76,7 +91,13 @@
   }
   
   async function handleLogout() {
+    if (!isFirebaseReady()) {
+      goto('/admin/login');
+      return;
+    }
+    
     try {
+      const auth = getFirebaseAuth();
       await signOut(auth);
       goto('/admin/login');
     } catch (error) {
@@ -87,7 +108,13 @@
   async function handleDeletePost(id: string) {
     if (!confirm('Are you sure you want to delete this post?')) return;
     
+    if (!isFirebaseReady()) {
+      alert('Firebase not initialized');
+      return;
+    }
+    
     try {
+      const db = getFirebaseDb();
       await deleteDoc(doc(db, 'posts', id));
       posts = posts.filter(p => p.id !== id);
     } catch (error) {
@@ -103,23 +130,33 @@
   }
   
   async function handlePostSaved(post: Post) {
+    if (!isFirebaseReady()) {
+      alert('Firebase not initialized');
+      return;
+    }
+    
     try {
+      const db = getFirebaseDb();
+      
       if (editingPost && editingPost.id) {
         // Update existing post
         await updateDoc(doc(db, 'posts', editingPost.id), {
-          title: post.title,
-          content: post.content,
-          imageURL: post.imageURL,
-          date: post.date
+          title: post.title.trim().slice(0, 200),
+          content: post.content.trim().slice(0, 5000),
+          imageURL: post.imageURL?.trim() || null,
+          date: post.date,
+          updatedAt: serverTimestamp()
         });
         posts = posts.map(p => p.id === editingPost!.id ? { ...post, id: editingPost!.id } : p);
       } else {
         // Create new post
         const docRef = await addDoc(collection(db, 'posts'), {
-          title: post.title,
-          content: post.content,
-          imageURL: post.imageURL,
-          date: post.date
+          title: post.title.trim().slice(0, 200),
+          content: post.content.trim().slice(0, 5000),
+          imageURL: post.imageURL?.trim() || null,
+          date: post.date,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
         });
         posts = [{ ...post, id: docRef.id }, ...posts];
       }
@@ -132,8 +169,14 @@
   }
   
   async function markMessageAsRead(messageId: string) {
+    if (!isFirebaseReady()) return;
+    
     try {
-      await updateDoc(doc(db, 'messages', messageId), { read: true });
+      const db = getFirebaseDb();
+      await updateDoc(doc(db, 'messages', messageId), { 
+        read: true,
+        readAt: serverTimestamp()
+      });
       messages = messages.map(m => m.id === messageId ? { ...m, read: true } : m);
     } catch (error) {
       console.error('Error marking message as read:', error);

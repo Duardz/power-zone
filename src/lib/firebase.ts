@@ -54,8 +54,24 @@ if (browser) {
   }
 }
 
+// Type guards
 export function isFirebaseReady(): boolean {
   return browser && auth !== undefined && db !== undefined;
 }
 
+export function getFirebaseAuth(): Auth {
+  if (!auth) {
+    throw new Error('Firebase Auth is not initialized');
+  }
+  return auth;
+}
+
+export function getFirebaseDb(): Firestore {
+  if (!db) {
+    throw new Error('Firebase Firestore is not initialized');
+  }
+  return db;
+}
+
+// Export with type safety
 export { auth, db };

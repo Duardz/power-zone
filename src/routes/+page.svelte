@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
-  import { db } from '$lib/firebase';
+  import { isFirebaseReady, getFirebaseDb } from '$lib/firebase';
   import PostCard from '$lib/components/PostCard.svelte';
   import type { Post } from '$lib/types';
   
@@ -31,50 +31,67 @@
   
   async function loadPosts() {
     try {
+      if (!isFirebaseReady()) {
+        console.warn('Firebase not ready, using fallback data');
+        loadFallbackData();
+        return;
+      }
+      
+      const db = getFirebaseDb();
       const postsQuery = query(
         collection(db, 'posts'), 
         orderBy('date', 'desc'), 
         limit(3)
       );
       const snapshot = await getDocs(postsQuery);
+      
+      if (snapshot.empty) {
+        loadFallbackData();
+        return;
+      }
+      
       recentPosts = snapshot.docs.map(doc => {
         const data = doc.data();
         return {
           id: doc.id,
-          title: data.title,
-          content: data.content,
+          title: data.title || 'Untitled',
+          content: data.content || '',
           imageURL: data.imageURL,
           date: data.date?.toDate ? data.date.toDate() : new Date(data.date)
         } as Post;
       });
     } catch (error) {
       console.error('Error fetching posts:', error);
-      // Fallback dummy data
-      recentPosts = [
-        {
-          id: '1',
-          title: 'Community Workout This Saturday',
-          content: 'Join us for a free community workout session. All fitness levels welcome!',
-          date: new Date('2025-01-15'),
-          imageURL: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=2070'
-        },
-        {
-          id: '2',
-          title: 'New Equipment Arrived',
-          content: 'We just added new dumbbells and resistance bands. Come check them out!',
-          date: new Date('2025-01-10'),
-        },
-        {
-          id: '3',
-          title: 'Welcome New Members',
-          content: 'Big welcome to all our new January members. Remember, every journey starts with a single step!',
-          date: new Date('2025-01-05'),
-          imageURL: 'https://images.unsplash.com/photo-1550345332-09e3ac987658?q=80&w=1887'
-        }
-      ];
+      loadFallbackData();
     } finally {
       loading = false;
     }
+  }
+  
+  function loadFallbackData() {
+    recentPosts = [
+      {
+        id: '1',
+        title: 'Community Workout This Saturday',
+        content: 'Join us for a free community workout session. All fitness levels welcome!',
+        date: new Date('2025-01-15'),
+        imageURL: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=2070'
+      },
+      {
+        id: '2',
+        title: 'New Equipment Arrived',
+        content: 'We just added new dumbbells and resistance bands. Come check them out!',
+        date: new Date('2025-01-10'),
+      },
+      {
+        id: '3',
+        title: 'Welcome New Members',
+        content: 'Big welcome to all our new January members. Remember, every journey starts with a single step!',
+        date: new Date('2025-01-05'),
+        imageURL: 'https://images.unsplash.com/photo-1550345332-09e3ac987658?q=80&w=1887'
+      }
+    ];
+    loading = false;
   }
 </script>
 

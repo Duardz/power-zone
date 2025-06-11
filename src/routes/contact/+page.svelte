@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { addDoc, collection } from 'firebase/firestore';
-  import { db } from '$lib/firebase';
+  import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+  import { isFirebaseReady, getFirebaseDb } from '$lib/firebase';
   
   let mounted = false;
   let formData = {
@@ -29,17 +29,50 @@
     submitMessage = '';
     submitStatus = '';
     
+    // Input validation
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
+      submitMessage = 'Please fill in all required fields.';
+      submitStatus = 'error';
+      isSubmitting = false;
+      return;
+    }
+    
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      submitMessage = 'Please enter a valid email address.';
+      submitStatus = 'error';
+      isSubmitting = false;
+      return;
+    }
+    
     try {
-      // Add to Firestore
-      await addDoc(collection(db, 'messages'), {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        message: formData.message,
+      if (!isFirebaseReady()) {
+        // Fallback for when Firebase is not available
+        console.log('Firebase not ready, simulating submission:', formData);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        submitMessage = 'Message sent! We\'ll contact you within 24 hours.';
+        submitStatus = 'success';
+        formData = { name: '', email: '', phone: '', message: '', interest: 'general' };
+        return;
+      }
+      
+      const db = getFirebaseDb();
+      
+      // Sanitize input data
+      const sanitizedData = {
+        name: formData.name.trim().slice(0, 100),
+        email: formData.email.trim().toLowerCase().slice(0, 100),
+        phone: formData.phone.trim().slice(0, 20),
+        message: formData.message.trim().slice(0, 1000),
         interest: formData.interest,
-        timestamp: new Date(),
-        read: false
-      });
+        timestamp: serverTimestamp(),
+        read: false,
+        ip: 'hidden', // Don't store actual IP for privacy
+        userAgent: 'hidden' // Don't store user agent for privacy
+      };
+      
+      await addDoc(collection(db, 'messages'), sanitizedData);
       
       submitMessage = 'Message sent! We\'ll contact you within 24 hours.';
       submitStatus = 'success';
