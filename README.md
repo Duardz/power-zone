@@ -90,9 +90,6 @@ This is proprietary software developed specifically for gym management. The code
 
 ## Getting in Touch
 
-If you're interested in learning more about this project, seeing a demo, or discussing similar development work, feel free to reach out:
-
-- Email: [your-email@example.com]
-- Developer: [Your Name]
+If you're interested in learning more about this project, seeing a demo, or discussing similar development work, feel free to reach out.
 
 I'm always happy to discuss the technical aspects of the project or explore how similar solutions might work for other organizations.
