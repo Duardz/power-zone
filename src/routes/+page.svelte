@@ -6,7 +6,7 @@
   import type { Post } from '$lib/types';
   
   let recentPosts: Post[] = [];
-  let loading = false;
+  let loading = true;
   let heroRef: HTMLElement;
   
   // Mouse parallax effect
@@ -22,32 +22,60 @@
     };
     
     window.addEventListener('mousemove', handleMouseMove);
+    
+    // Load posts from Firestore
+    loadPosts();
+    
     return () => window.removeEventListener('mousemove', handleMouseMove);
   });
   
-  // Dummy data for now
-  recentPosts = [
-    {
-      id: '1',
-      title: 'Community Workout This Saturday',
-      content: 'Join us for a free community workout session. All fitness levels welcome!',
-      date: new Date('2025-01-15'),
-      imageURL: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=2070'
-    },
-    {
-      id: '2',
-      title: 'New Equipment Arrived',
-      content: 'We just added new dumbbells and resistance bands. Come check them out!',
-      date: new Date('2025-01-10'),
-    },
-    {
-      id: '3',
-      title: 'Welcome New Members',
-      content: 'Big welcome to all our new January members. Remember, every journey starts with a single step!',
-      date: new Date('2025-01-05'),
-      imageURL: 'https://images.unsplash.com/photo-1550345332-09e3ac987658?q=80&w=1887'
+  async function loadPosts() {
+    try {
+      const postsQuery = query(
+        collection(db, 'posts'), 
+        orderBy('date', 'desc'), 
+        limit(3)
+      );
+      const snapshot = await getDocs(postsQuery);
+      recentPosts = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          title: data.title,
+          content: data.content,
+          imageURL: data.imageURL,
+          date: data.date?.toDate ? data.date.toDate() : new Date(data.date)
+        } as Post;
+      });
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      // Fallback dummy data
+      recentPosts = [
+        {
+          id: '1',
+          title: 'Community Workout This Saturday',
+          content: 'Join us for a free community workout session. All fitness levels welcome!',
+          date: new Date('2025-01-15'),
+          imageURL: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=2070'
+        },
+        {
+          id: '2',
+          title: 'New Equipment Arrived',
+          content: 'We just added new dumbbells and resistance bands. Come check them out!',
+          date: new Date('2025-01-10'),
+        },
+        {
+          id: '3',
+          title: 'Welcome New Members',
+          content: 'Big welcome to all our new January members. Remember, every journey starts with a single step!',
+          date: new Date('2025-01-05'),
+          imageURL: 'https://images.unsplash.com/photo-1550345332-09e3ac987658?q=80&w=1887'
+        }
+      ];
+    } finally {
+      loading = false;
     }
-  ];
+  }
 </script>
 
 <svelte:head>

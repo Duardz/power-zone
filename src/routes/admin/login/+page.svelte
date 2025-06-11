@@ -1,8 +1,9 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { signInWithEmailAndPassword } from 'firebase/auth';
+  import { signInWithEmailAndPassword, type UserCredential } from 'firebase/auth';
   import { auth } from '$lib/firebase';
   import { onMount } from 'svelte';
+  import { browser } from '$app/environment';
   
   let email = '';
   let password = '';
@@ -13,6 +14,17 @@
   
   onMount(() => {
     mounted = true;
+    
+    // Check if already logged in
+    if (browser && auth && auth.onAuthStateChanged) {
+      const unsubscribe = auth.onAuthStateChanged((user) => {
+        if (user) {
+          goto('/admin/dashboard');
+        }
+      });
+      
+      return () => unsubscribe();
+    }
   });
   
   async function handleLogin(e: Event) {
@@ -20,21 +32,48 @@
     error = '';
     isLoading = true;
     
+    // Basic validation
+    if (!email || !password) {
+      error = 'Please enter both email and password.';
+      isLoading = false;
+      return;
+    }
+    
     try {
-      // For now, just simulate login
-      console.log('Login attempt:', { email, password });
+      // Check if Firebase is available
+      if (!browser || !auth) {
+        throw new Error('Authentication service not available');
+      }
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Uncomment when Firebase is configured
-      // await signInWithEmailAndPassword(auth, email, password);
-      
-      // Simulate successful login
-      await goto('/admin/dashboard');
+      const userCredential: UserCredential = await signInWithEmailAndPassword(auth, email, password);
+      console.log('Login successful:', userCredential.user.email);
+      // Navigation will be handled by onAuthStateChanged
     } catch (err: any) {
-      error = err.message || 'Authentication failed. Access denied.';
       console.error('Login error:', err);
+      
+      // Handle specific Firebase Auth errors
+      switch (err.code) {
+        case 'auth/user-not-found':
+          error = 'No user found with this email address.';
+          break;
+        case 'auth/wrong-password':
+          error = 'Incorrect password. Please try again.';
+          break;
+        case 'auth/invalid-email':
+          error = 'Invalid email address format.';
+          break;
+        case 'auth/user-disabled':
+          error = 'This account has been disabled.';
+          break;
+        case 'auth/too-many-requests':
+          error = 'Too many failed attempts. Please try again later.';
+          break;
+        case 'auth/network-request-failed':
+          error = 'Network error. Please check your connection.';
+          break;
+        default:
+          error = err.message || 'Authentication failed. Please try again.';
+      }
     } finally {
       isLoading = false;
     }
@@ -42,7 +81,7 @@
 </script>
 
 <svelte:head>
-  <title>Admin Access - Power Zone Control Center</title>
+  <title>Admin Access - PowerZone Control Center</title>
 </svelte:head>
 
 <section class="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
@@ -93,7 +132,7 @@
         <div class="flex items-center gap-2 mb-6 p-3 bg-gym-red/10 border border-gym-red/30 rounded">
           <div class="w-2 h-2 bg-gym-red rounded-full animate-pulse"></div>
           <span class="text-xs font-bold uppercase tracking-wider text-gym-red">
-            Secure Connection Active
+            {auth ? 'Secure Connection Active' : 'Connection Initializing...'}
           </span>
         </div>
         
@@ -108,11 +147,12 @@
               id="email"
               bind:value={email}
               required
-              disabled={isLoading}
+              disabled={isLoading || !auth}
               class="w-full px-4 py-3 bg-black border border-gray-800 rounded-lg 
                      focus:border-gym-red focus:outline-none transition-all duration-300
-                     hover:border-gray-700 pl-10 disabled:opacity-50"
+                     hover:border-gray-700 pl-10 disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder="admin@powerzone.gym"
+              autocomplete="username"
             />
             <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -134,11 +174,12 @@
               id="password"
               bind:value={password}
               required
-              disabled={isLoading}
+              disabled={isLoading || !auth}
               class="w-full px-4 py-3 bg-black border border-gray-800 rounded-lg 
                      focus:border-gym-red focus:outline-none transition-all duration-300
-                     hover:border-gray-700 pl-10 pr-12 disabled:opacity-50"
+                     hover:border-gray-700 pl-10 pr-12 disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder="••••••••"
+              autocomplete="current-password"
             />
             <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,8 +190,10 @@
             <button
               type="button"
               on:click={() => showPassword = !showPassword}
+              disabled={isLoading || !auth}
               class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gym-red 
-                     transition-colors"
+                     transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {#if showPassword}
@@ -170,7 +213,7 @@
         {#if error}
           <div class="mb-6 p-4 bg-red-900/20 border border-red-800 rounded-lg animate-slide-up">
             <div class="flex items-start gap-3">
-              <div class="text-red-500 mt-0.5">
+              <div class="text-red-500 mt-0.5 flex-shrink-0">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                         d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -187,14 +230,20 @@
         <!-- Submit Button -->
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || !email || !password || !auth}
           class="relative w-full py-4 bg-gym-red font-black uppercase tracking-wider 
                  transition-all duration-300 overflow-hidden group
                  hover:shadow-[0_0_30px_rgba(220,38,38,0.5)]
                  disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span class="relative z-10">
-            {isLoading ? 'AUTHENTICATING...' : 'INITIALIZE SESSION'}
+            {#if !auth}
+              INITIALIZING...
+            {:else if isLoading}
+              AUTHENTICATING...
+            {:else}
+              INITIALIZE SESSION
+            {/if}
           </span>
           <div class="absolute inset-0 bg-gradient-to-r from-red-600 to-red-800 
                       translate-x-full group-hover:translate-x-0 transition-transform duration-500"></div>
@@ -209,6 +258,13 @@
             </div>
           {/if}
         </button>
+        
+        <!-- Forgot Password Link -->
+        <div class="mt-4 text-center">
+          <a href="/admin/forgot-password" class="text-sm text-gray-400 hover:text-gym-red transition-colors">
+            Forgot your password?
+          </a>
+        </div>
       </div>
       
       <!-- Corner accents -->
@@ -220,8 +276,11 @@
     
     <!-- Footer -->
     <div class="text-center mt-8">
-      <a href="/" class="text-gray-400 hover:text-gym-red transition-colors text-sm">
-        ← Return to Main Site
+      <a href="/" class="text-gray-400 hover:text-gym-red transition-colors text-sm inline-flex items-center gap-2 group">
+        <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Return to Main Site
       </a>
     </div>
     
@@ -232,6 +291,15 @@
         All access attempts are logged.
       </p>
     </div>
+    
+    <!-- Demo Credentials (Remove in production) -->
+    {#if import.meta.env.DEV}
+      <div class="mt-4 p-3 border border-gray-800 rounded-lg bg-black/50">
+        <p class="text-xs text-gray-500 text-center">
+          Demo: admin@powerzone.gym / password123
+        </p>
+      </div>
+    {/if}
   </div>
 </section>
 
@@ -265,5 +333,49 @@
   
   .animate-scan-vertical {
     animation: scan-vertical 8s linear infinite;
+  }
+  
+  /* Additional animations */
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+  
+  .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-slide-up {
+    animation: slide-up 0.6s ease-out;
+  }
+  
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(-25%);
+      animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+      transform: translateY(0);
+      animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+  }
+  
+  .animate-bounce {
+    animation: bounce 1s infinite;
   }
 </style>

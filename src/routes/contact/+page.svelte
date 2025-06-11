@@ -30,20 +30,20 @@
     submitStatus = '';
     
     try {
-      // For now, just log the data since Firebase might not be configured
-      console.log('Form submission:', formData);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Uncomment when Firebase is set up
-      // await addDoc(collection(db, 'messages'), {
-      //   ...formData,
-      //   timestamp: new Date()
-      // });
+      // Add to Firestore
+      await addDoc(collection(db, 'messages'), {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        message: formData.message,
+        interest: formData.interest,
+        timestamp: new Date(),
+        read: false
+      });
       
       submitMessage = 'Message sent! We\'ll contact you within 24 hours.';
       submitStatus = 'success';
+      // Reset form
       formData = { name: '', email: '', phone: '', message: '', interest: 'general' };
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -119,9 +119,10 @@
                 on:focus={() => focusedField = 'name'}
                 on:blur={() => focusedField = ''}
                 required
+                disabled={isSubmitting}
                 class="w-full px-4 py-3 bg-black border border-gray-800 rounded-lg 
                        focus:border-gym-red focus:outline-none transition-all duration-300
-                       hover:border-gray-700"
+                       hover:border-gray-700 disabled:opacity-50"
                 placeholder="Juan Dela Cruz"
               />
               {#if focusedField === 'name'}
@@ -141,9 +142,10 @@
                 on:focus={() => focusedField = 'email'}
                 on:blur={() => focusedField = ''}
                 required
+                disabled={isSubmitting}
                 class="w-full px-4 py-3 bg-black border border-gray-800 rounded-lg 
                        focus:border-gym-red focus:outline-none transition-all duration-300
-                       hover:border-gray-700"
+                       hover:border-gray-700 disabled:opacity-50"
                 placeholder="your.email@gmail.com"
               />
               {#if focusedField === 'email'}
@@ -162,9 +164,10 @@
                 bind:value={formData.phone}
                 on:focus={() => focusedField = 'phone'}
                 on:blur={() => focusedField = ''}
+                disabled={isSubmitting}
                 class="w-full px-4 py-3 bg-black border border-gray-800 rounded-lg 
                        focus:border-gym-red focus:outline-none transition-all duration-300
-                       hover:border-gray-700"
+                       hover:border-gray-700 disabled:opacity-50"
                 placeholder="+63 9XX XXX XXXX"
               />
               {#if focusedField === 'phone'}
@@ -182,9 +185,10 @@
                 bind:value={formData.interest}
                 on:focus={() => focusedField = 'interest'}
                 on:blur={() => focusedField = ''}
+                disabled={isSubmitting}
                 class="w-full px-4 py-3 bg-black border border-gray-800 rounded-lg 
                        focus:border-gym-red focus:outline-none transition-all duration-300
-                       hover:border-gray-700 cursor-pointer"
+                       hover:border-gray-700 cursor-pointer disabled:opacity-50"
               >
                 <option value="general">General Inquiry</option>
                 <option value="membership">Membership Information</option>
@@ -207,10 +211,11 @@
                 on:focus={() => focusedField = 'message'}
                 on:blur={() => focusedField = ''}
                 required
+                disabled={isSubmitting}
                 rows="5"
                 class="w-full px-4 py-3 bg-black border border-gray-800 rounded-lg 
                        focus:border-gym-red focus:outline-none transition-all duration-300
-                       hover:border-gray-700 resize-none"
+                       hover:border-gray-700 resize-none disabled:opacity-50"
                 placeholder="Tell us how we can help you..."
               ></textarea>
               {#if focusedField === 'message'}
@@ -473,11 +478,6 @@
   /* Custom form field animations */
   input:focus, select:focus, textarea:focus {
     background-color: rgba(220, 38, 38, 0.05);
-  }
-  
-  /* Floating label effect */
-  .floating-label {
-    transition: all 0.3s ease;
   }
   
   /* Glitch effect for headers */

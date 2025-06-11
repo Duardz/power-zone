@@ -1,21 +1,61 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
+import { getAuth, type Auth } from 'firebase/auth';
+import { getFirestore, type Firestore } from 'firebase/firestore';
 import { browser } from '$app/environment';
 
-// Use optional chaining and provide defaults for build time
-const firebaseConfig = {
-  apiKey: import.meta.env.PUBLIC_FIREBASE_API_KEY || "dummy-api-key",
-  authDomain: import.meta.env.PUBLIC_FIREBASE_AUTH_DOMAIN || "dummy-auth-domain",
-  projectId: import.meta.env.PUBLIC_FIREBASE_PROJECT_ID || "dummy-project-id",
-  storageBucket: import.meta.env.PUBLIC_FIREBASE_STORAGE_BUCKET || "dummy-storage-bucket",
-  messagingSenderId: import.meta.env.PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "dummy-sender-id",
-  appId: import.meta.env.PUBLIC_FIREBASE_APP_ID || "dummy-app-id"
-};
+// Use VITE_ prefix for environment variables per Vite convention
+const firebaseConfig = Object.freeze({
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY ?? '',
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN ?? '',
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID ?? '',
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET ?? '',
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID ?? '',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID ?? '',
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID ?? ''
+});
 
-// Initialize Firebase only in browser
-const app = browser ? initializeApp(firebaseConfig) : {};
-const auth = browser ? getAuth(app as any) : {};
-const db = browser ? getFirestore(app as any) : {};
+function validateFirebaseConfig(config: typeof firebaseConfig): boolean {
+  const requiredFields = ['apiKey', 'authDomain', 'projectId', 'appId'] as const;
+  for (const field of requiredFields) {
+    if (!config[field]) {
+      console.error(`[Firebase] Missing required config field: ${field}`);
+      return false;
+    }
+  }
+  return true;
+}
+
+let app: FirebaseApp | undefined;
+let auth: Auth | undefined;
+let db: Firestore | undefined;
+
+if (browser) {
+  try {
+    if (!validateFirebaseConfig(firebaseConfig)) {
+      throw new Error('Invalid Firebase configuration');
+    }
+
+    // Use existing app if already initialized to avoid errors
+    if (getApps().length === 0) {
+      console.log('[Firebase] Initializing app...');
+      app = initializeApp(firebaseConfig);
+      console.log('[Firebase] App initialized successfully');
+    } else {
+      app = getApp();
+      console.log('[Firebase] Using existing Firebase app instance');
+    }
+
+    auth = getAuth(app);
+    db = getFirestore(app);
+  } catch (error) {
+    console.error('[Firebase] Initialization error:', error);
+    auth = undefined;
+    db = undefined;
+  }
+}
+
+export function isFirebaseReady(): boolean {
+  return browser && auth !== undefined && db !== undefined;
+}
 
 export { auth, db };
