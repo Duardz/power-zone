@@ -186,15 +186,16 @@
                 on:focus={() => focusedField = 'interest'}
                 on:blur={() => focusedField = ''}
                 disabled={isSubmitting}
-                class="w-full px-4 py-3 bg-black border border-gray-800 rounded-lg 
-                       focus:border-gym-red focus:outline-none transition-all duration-300
-                       hover:border-gray-700 cursor-pointer disabled:opacity-50"
+                class="w-full px-4 py-3 bg-black text-white border border-gray-800 rounded-lg 
+                      focus:bg-white focus:text-black focus:border-gym-red focus:outline-none 
+                      transition-all duration-300 hover:border-gray-700 cursor-pointer disabled:opacity-50"
               >
                 <option value="general">General Inquiry</option>
                 <option value="membership">Membership Information</option>
                 <option value="visit">Schedule a Visit</option>
                 <option value="feedback">Feedback/Suggestions</option>
               </select>
+
               {#if focusedField === 'interest'}
                 <div class="absolute bottom-0 left-0 w-full h-0.5 bg-gym-red animate-pulse"></div>
               {/if}
