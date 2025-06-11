@@ -376,7 +376,7 @@
 </section>
 
 <!-- Recent Posts -->
-<section class="py-32 px-4 bg-gradient-to-b from-transparent via-black/50 to-transparent">
+<section class="py-32 px-4 bg-gradient-to-b from-transparent via-black/50 to-transparent bg-black/58">
   <div class="container mx-auto max-w-7xl">
     <div class="text-center mb-16">
       <span class="inline-block px-4 py-1 bg-gym-red/20 border border-gym-red/50 rounded-full 
