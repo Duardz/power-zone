@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { signInWithEmailAndPassword, type UserCredential } from 'firebase/auth';
-  import { auth } from '$lib/firebase';
+  import { signInWithEmailAndPassword, onAuthStateChanged, type UserCredential } from 'firebase/auth';
+  import { isFirebaseReady, getFirebaseAuth } from '$lib/firebase';
   import { onMount } from 'svelte';
   import { browser } from '$app/environment';
   
@@ -11,20 +11,36 @@
   let isLoading = false;
   let showPassword = false;
   let mounted = false;
+  let firebaseInitialized = false;
   
   onMount(() => {
     mounted = true;
     
-    // Check if already logged in
-    if (browser && auth && auth.onAuthStateChanged) {
-      const unsubscribe = auth.onAuthStateChanged((user) => {
-        if (user) {
-          goto('/admin/dashboard');
-        }
-      });
-      
-      return () => unsubscribe();
-    }
+    // Wait for Firebase to be ready
+    const checkFirebase = setInterval(() => {
+      if (isFirebaseReady()) {
+        firebaseInitialized = true;
+        clearInterval(checkFirebase);
+        
+        // Check if already logged in
+        const auth = getFirebaseAuth();
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+          if (user) {
+            goto('/admin/dashboard');
+          }
+        });
+        
+        return () => unsubscribe();
+      }
+    }, 100);
+    
+    // Timeout after 5 seconds
+    setTimeout(() => {
+      if (!firebaseInitialized) {
+        clearInterval(checkFirebase);
+        error = 'Failed to initialize authentication service. Please refresh the page.';
+      }
+    }, 5000);
   });
   
   async function handleLogin(e: Event) {
@@ -39,12 +55,21 @@
       return;
     }
     
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      error = 'Please enter a valid email address.';
+      isLoading = false;
+      return;
+    }
+    
     try {
       // Check if Firebase is available
-      if (!browser || !auth) {
-        throw new Error('Authentication service not available');
+      if (!isFirebaseReady()) {
+        throw new Error('Authentication service not available. Please refresh the page.');
       }
       
+      const auth = getFirebaseAuth();
       const userCredential: UserCredential = await signInWithEmailAndPassword(auth, email, password);
       console.log('Login successful:', userCredential.user.email);
       // Navigation will be handled by onAuthStateChanged
@@ -53,8 +78,9 @@
       
       // Handle specific Firebase Auth errors
       switch (err.code) {
+        case 'auth/invalid-credential':
         case 'auth/user-not-found':
-          error = 'No user found with this email address.';
+          error = 'Invalid email or password.';
           break;
         case 'auth/wrong-password':
           error = 'Incorrect password. Please try again.';
@@ -76,6 +102,12 @@
       }
     } finally {
       isLoading = false;
+    }
+  }
+  
+  function handleKeyDown(e: KeyboardEvent) {
+    if (e.key === 'Enter' && !isLoading && firebaseInitialized) {
+      handleLogin(e as any);
     }
   }
 </script>
@@ -125,14 +157,15 @@
     </div>
     
     <!-- Login Form -->
-    <form on:submit={handleLogin} class="relative">
+    <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+    <form on:submit={handleLogin} on:keydown={handleKeyDown} class="relative">
       <div class="futuristic-card p-8 border-2 border-gray-800 hover:border-gym-red/50 
                   transition-all duration-500">
         <!-- Security Status -->
         <div class="flex items-center gap-2 mb-6 p-3 bg-gym-red/10 border border-gym-red/30 rounded">
           <div class="w-2 h-2 bg-gym-red rounded-full animate-pulse"></div>
           <span class="text-xs font-bold uppercase tracking-wider text-gym-red">
-            {auth ? 'Secure Connection Active' : 'Connection Initializing...'}
+            {firebaseInitialized ? 'Secure Connection Active' : 'Connection Initializing...'}
           </span>
         </div>
         
@@ -147,7 +180,7 @@
               id="email"
               bind:value={email}
               required
-              disabled={isLoading || !auth}
+              disabled={isLoading || !firebaseInitialized}
               class="w-full px-4 py-3 bg-black border border-gray-800 rounded-lg 
                      focus:border-gym-red focus:outline-none transition-all duration-300
                      hover:border-gray-700 pl-10 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -174,7 +207,7 @@
               id="password"
               bind:value={password}
               required
-              disabled={isLoading || !auth}
+              disabled={isLoading || !firebaseInitialized}
               class="w-full px-4 py-3 bg-black border border-gray-800 rounded-lg 
                      focus:border-gym-red focus:outline-none transition-all duration-300
                      hover:border-gray-700 pl-10 pr-12 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -190,7 +223,7 @@
             <button
               type="button"
               on:click={() => showPassword = !showPassword}
-              disabled={isLoading || !auth}
+              disabled={isLoading || !firebaseInitialized}
               class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gym-red 
                      transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label={showPassword ? 'Hide password' : 'Show password'}
@@ -230,14 +263,14 @@
         <!-- Submit Button -->
         <button
           type="submit"
-          disabled={isLoading || !email || !password || !auth}
+          disabled={isLoading || !email || !password || !firebaseInitialized}
           class="relative w-full py-4 bg-gym-red font-black uppercase tracking-wider 
                  transition-all duration-300 overflow-hidden group
                  hover:shadow-[0_0_30px_rgba(220,38,38,0.5)]
                  disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span class="relative z-10">
-            {#if !auth}
+            {#if !firebaseInitialized}
               INITIALIZING...
             {:else if isLoading}
               AUTHENTICATING...
@@ -377,5 +410,9 @@
   
   .animate-bounce {
     animation: bounce 1s infinite;
+  }
+  
+  .glow-text {
+    text-shadow: 0 0 10px rgba(220, 38, 38, 0.8);
   }
 </style>

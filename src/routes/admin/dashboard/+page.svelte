@@ -2,7 +2,19 @@
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { signOut, onAuthStateChanged, type User } from 'firebase/auth';
-  import { collection, query, orderBy, getDocs, deleteDoc, doc, addDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+  import { 
+    collection, 
+    query, 
+    orderBy, 
+    getDocs, 
+    deleteDoc, 
+    doc, 
+    addDoc, 
+    updateDoc, 
+    serverTimestamp,
+    Timestamp,
+    type DocumentData 
+  } from 'firebase/firestore';
   import { isFirebaseReady, getFirebaseAuth, getFirebaseDb } from '$lib/firebase';
   import PostCard from '$lib/components/PostCard.svelte';
   import AdminPostForm from '$lib/components/AdminPostForm.svelte';
@@ -17,10 +29,35 @@
   let activeTab = 'overview';
   let mounted = false;
   let currentUser: User | null = null;
+  let firebaseInitialized = false;
   
   onMount(() => {
     mounted = true;
     
+    // Wait for Firebase to be ready
+    const checkFirebase = setInterval(() => {
+      if (isFirebaseReady()) {
+        firebaseInitialized = true;
+        clearInterval(checkFirebase);
+        initializeAuth();
+      }
+    }, 100);
+    
+    // Timeout after 5 seconds
+    setTimeout(() => {
+      if (!firebaseInitialized) {
+        clearInterval(checkFirebase);
+        console.error('Firebase initialization timeout');
+        goto('/admin/login');
+      }
+    }, 5000);
+    
+    return () => {
+      if (checkFirebase) clearInterval(checkFirebase);
+    };
+  });
+  
+  function initializeAuth() {
     if (!isFirebaseReady()) {
       console.error('Firebase not initialized');
       goto('/admin/login');
@@ -41,7 +78,7 @@
     });
     
     return () => unsubscribe();
-  });
+  }
   
   async function loadData() {
     if (!isFirebaseReady()) {
@@ -55,30 +92,30 @@
       // Load posts
       const postsQuery = query(collection(db, 'posts'), orderBy('date', 'desc'));
       const postsSnapshot = await getDocs(postsQuery);
-      posts = postsSnapshot.docs.map(doc => {
-        const data = doc.data();
+      posts = postsSnapshot.docs.map(docSnapshot => {
+        const data = docSnapshot.data();
         return {
-          id: doc.id,
+          id: docSnapshot.id,
           title: data.title || 'Untitled',
           content: data.content || '',
           imageURL: data.imageURL,
-          date: data.date?.toDate ? data.date.toDate() : new Date(data.date)
+          date: convertToDate(data.date)
         } as Post;
       });
       
       // Load messages
       const messagesQuery = query(collection(db, 'messages'), orderBy('timestamp', 'desc'));
       const messagesSnapshot = await getDocs(messagesQuery);
-      messages = messagesSnapshot.docs.map(doc => {
-        const data = doc.data();
+      messages = messagesSnapshot.docs.map(docSnapshot => {
+        const data = docSnapshot.data();
         return {
-          id: doc.id,
+          id: docSnapshot.id,
           name: data.name || 'Anonymous',
           email: data.email || '',
           phone: data.phone,
           message: data.message || '',
           interest: data.interest || 'general',
-          timestamp: data.timestamp?.toDate ? data.timestamp.toDate() : new Date(data.timestamp),
+          timestamp: convertToDate(data.timestamp),
           read: data.read || false
         } as ContactMessage;
       });
@@ -88,6 +125,21 @@
       console.error('Error loading data:', error);
       isLoading = false;
     }
+  }
+  
+  // Helper function to safely convert Firestore timestamps
+  function convertToDate(timestamp: any): Date {
+    if (!timestamp) return new Date();
+    if (timestamp instanceof Timestamp) {
+      return timestamp.toDate();
+    }
+    if (timestamp.toDate && typeof timestamp.toDate === 'function') {
+      return timestamp.toDate();
+    }
+    if (timestamp instanceof Date) {
+      return timestamp;
+    }
+    return new Date(timestamp);
   }
   
   async function handleLogout() {
@@ -102,6 +154,7 @@
       goto('/admin/login');
     } catch (error) {
       console.error('Logout error:', error);
+      alert('Failed to logout. Please try again.');
     }
   }
   
@@ -138,26 +191,22 @@
     try {
       const db = getFirebaseDb();
       
+      const postData: DocumentData = {
+        title: post.title.trim().slice(0, 200),
+        content: post.content.trim().slice(0, 5000),
+        imageURL: post.imageURL?.trim() || null,
+        date: Timestamp.fromDate(post.date),
+        updatedAt: serverTimestamp()
+      };
+      
       if (editingPost && editingPost.id) {
         // Update existing post
-        await updateDoc(doc(db, 'posts', editingPost.id), {
-          title: post.title.trim().slice(0, 200),
-          content: post.content.trim().slice(0, 5000),
-          imageURL: post.imageURL?.trim() || null,
-          date: post.date,
-          updatedAt: serverTimestamp()
-        });
+        await updateDoc(doc(db, 'posts', editingPost.id), postData);
         posts = posts.map(p => p.id === editingPost!.id ? { ...post, id: editingPost!.id } : p);
       } else {
         // Create new post
-        const docRef = await addDoc(collection(db, 'posts'), {
-          title: post.title.trim().slice(0, 200),
-          content: post.content.trim().slice(0, 5000),
-          imageURL: post.imageURL?.trim() || null,
-          date: post.date,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
-        });
+        postData.createdAt = serverTimestamp();
+        const docRef = await addDoc(collection(db, 'posts'), postData);
         posts = [{ ...post, id: docRef.id }, ...posts];
       }
       showPostForm = false;
@@ -181,6 +230,27 @@
     } catch (error) {
       console.error('Error marking message as read:', error);
     }
+  }
+  
+  async function handleDeleteMessage(messageId: string) {
+    if (!confirm('Are you sure you want to delete this message?')) return;
+    
+    if (!isFirebaseReady()) return;
+    
+    try {
+      const db = getFirebaseDb();
+      await deleteDoc(doc(db, 'messages', messageId));
+      messages = messages.filter(m => m.id !== messageId);
+    } catch (error) {
+      console.error('Error deleting message:', error);
+      alert('Failed to delete message. Please try again.');
+    }
+  }
+  
+  // Refresh data
+  async function refreshData() {
+    isLoading = true;
+    await loadData();
   }
 </script>
 
@@ -214,6 +284,19 @@
               Logged in as: {currentUser.email}
             </span>
           {/if}
+          <!-- svelte-ignore a11y_consider_explicit_label -->
+          <button
+            on:click={refreshData}
+            disabled={isLoading}
+            class="px-4 py-2 text-gray-400 hover:text-white transition-colors text-sm font-bold 
+                   uppercase tracking-wider disabled:opacity-50"
+            title="Refresh data"
+          >
+            <svg class="w-5 h-5 {isLoading ? 'animate-spin' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </button>
           <button
             on:click={() => goto('/')}
             class="px-4 py-2 text-gray-400 hover:text-white transition-colors text-sm font-bold 
@@ -235,7 +318,7 @@
   </header>
   
   <main class="container mx-auto px-4 py-8">
-    {#if isLoading}
+    {#if isLoading && !posts.length && !messages.length}
       <div class="flex flex-col items-center justify-center py-32">
         <div class="relative">
           <div class="w-20 h-20 border-4 border-gray-800 rounded-full"></div>
@@ -260,6 +343,11 @@
                      : 'text-gray-400 hover:text-white hover:bg-gray-800'}"
           >
             {tab}
+            {#if tab === 'messages' && messages.filter(m => !m.read).length > 0}
+              <span class="ml-2 px-2 py-0.5 bg-white/20 rounded-full text-xs">
+                {messages.filter(m => !m.read).length}
+              </span>
+            {/if}
           </button>
         {/each}
       </div>
@@ -345,9 +433,16 @@
         {:else if activeTab === 'messages'}
           <!-- Messages Tab -->
           <section>
-            <h2 class="text-3xl font-black mb-6">
-              INCOMING <span class="text-gym-red">TRANSMISSIONS</span>
-            </h2>
+            <div class="flex items-center justify-between mb-6">
+              <h2 class="text-3xl font-black">
+                INCOMING <span class="text-gym-red">TRANSMISSIONS</span>
+              </h2>
+              <div class="flex items-center gap-4">
+                <span class="text-sm text-gray-400">
+                  {messages.filter(m => !m.read).length} unread of {messages.length} total
+                </span>
+              </div>
+            </div>
             
             {#if messages.length === 0}
               <div class="text-center py-20 futuristic-card border border-gray-800">
@@ -364,7 +459,7 @@
                           <h3 class="font-bold text-lg">{message.name}</h3>
                           {#if !message.read}
                             <span class="px-2 py-1 bg-gym-red/20 border border-gym-red/50 rounded-full 
-                                         text-xs font-bold text-gym-red uppercase">
+                                         text-xs font-bold text-gym-red uppercase animate-pulse">
                               New
                             </span>
                           {/if}
@@ -386,15 +481,15 @@
                     
                     <div class="mb-4">
                       <span class="text-xs font-bold text-gray-400 uppercase">Interest: </span>
-                      <span class="text-sm text-gray-300">{message.interest}</span>
+                      <span class="text-sm text-gray-300 capitalize">{(message.interest || 'general').replace('_', ' ')}</span>
                     </div>
                     
-                    <p class="text-gray-300 mb-4">{message.message}</p>
+                    <p class="text-gray-300 mb-4 whitespace-pre-wrap">{message.message}</p>
                     
                     <div class="flex gap-3">
                       {#if !message.read}
                         <button 
-                          on:click={() => markMessageAsRead(message.id!)}
+                          on:click={() => message.id && markMessageAsRead(message.id)}
                           class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded text-sm 
                                  font-bold uppercase tracking-wider transition-all duration-300"
                         >
@@ -402,13 +497,21 @@
                         </button>
                       {/if}
                       <a 
-                        href="mailto:{message.email}"
+                        href="mailto:{message.email}?subject=Re: PowerZone Inquiry - {message.interest}"
                         class="px-4 py-2 bg-gym-red/20 hover:bg-gym-red border border-gym-red/50 
                                hover:border-gym-red rounded text-sm font-bold uppercase 
                                tracking-wider transition-all duration-300"
                       >
                         Reply
                       </a>
+                      <button 
+                        on:click={() => message.id && handleDeleteMessage(message.id)}
+                        class="px-4 py-2 bg-red-900/20 hover:bg-red-900/40 border border-red-900/50 
+                               hover:border-red-700 rounded text-sm font-bold uppercase 
+                               tracking-wider transition-all duration-300 ml-auto"
+                      >
+                        Delete
+                      </button>
                     </div>
                   </div>
                 {/each}
@@ -423,20 +526,108 @@
               PERFORMANCE <span class="text-gym-red">METRICS</span>
             </h2>
             
-            <div class="futuristic-card p-8 border border-gray-800 text-center">
-              <div class="max-w-md mx-auto">
-                <div class="text-6xl mb-4">📊</div>
-                <h3 class="text-2xl font-bold mb-2">Analytics Module</h3>
-                <p class="text-gray-400 mb-6">
-                  Advanced analytics and reporting features coming soon. 
-                  Track member engagement, revenue metrics, and growth patterns.
-                </p>
-                <div class="inline-flex items-center gap-2 px-4 py-2 bg-gym-red/20 
-                            border border-gym-red/50 rounded-full">
-                  <div class="w-2 h-2 bg-gym-red rounded-full animate-pulse"></div>
-                  <span class="text-sm font-bold uppercase tracking-wider text-gym-red">
-                    In Development
-                  </span>
+            <!-- Time Period Stats -->
+            <div class="grid md:grid-cols-3 gap-6 mb-8">
+              {#each [
+                { 
+                  label: 'Messages This Month', 
+                  value: messages.filter(m => {
+                    const msgDate = new Date(m.timestamp);
+                    const now = new Date();
+                    return msgDate.getMonth() === now.getMonth() && msgDate.getFullYear() === now.getFullYear();
+                  }).length,
+                  icon: '📅'
+                },
+                { 
+                  label: 'Response Rate', 
+                  value: messages.length > 0 ? `${Math.round((messages.filter(m => m.read).length / messages.length) * 100)}%` : '0%',
+                  icon: '📊'
+                },
+                { 
+                  label: 'Avg Daily Messages', 
+                  value: messages.length > 0 ? (messages.length / 30).toFixed(1) : '0',
+                  icon: '📈'
+                }
+              ] as stat}
+                <div class="futuristic-card p-6 border border-gray-800">
+                  <div class="text-3xl mb-3">{stat.icon}</div>
+                  <p class="text-2xl font-black text-white mb-1">{stat.value}</p>
+                  <p class="text-sm text-gray-400 uppercase tracking-wider">{stat.label}</p>
+                </div>
+              {/each}
+            </div>
+            
+            <!-- Interest Trends -->
+            <div class="futuristic-card p-6 border border-gray-800 mb-8">
+              <h3 class="text-xl font-black mb-4">POPULAR INTERESTS</h3>
+              <div class="space-y-4">
+                {#each Object.entries(
+                  messages.reduce((acc, msg) => {
+                    const interest = msg.interest || 'general';
+                    acc[interest] = (acc[interest] || 0) + 1;
+                    return acc;
+                  }, {} as Record<string, number>)
+                ).sort((a, b) => b[1] - a[1]).slice(0, 5) as [interest, count]}
+                  <div>
+                    <div class="flex justify-between mb-2">
+                      <span class="font-bold capitalize">{interest.replace(/_/g, ' ')}</span>
+                      <span class="text-gym-red">{count} inquiries</span>
+                    </div>
+                    <div class="w-full bg-gray-800 rounded-full h-3">
+                      <div 
+                        class="bg-gradient-to-r from-gym-red to-red-600 h-3 rounded-full transition-all duration-500"
+                        style="width: {(count / messages.length) * 100}%"
+                      ></div>
+                    </div>
+                  </div>
+                {/each}
+              </div>
+            </div>
+            
+            <!-- Content Performance -->
+            <div class="futuristic-card p-6 border border-gray-800">
+              <h3 class="text-xl font-black mb-4">CONTENT INSIGHTS</h3>
+              <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                  <h4 class="font-bold text-gray-400 mb-3">POST FREQUENCY</h4>
+                  <div class="space-y-2">
+                    <div class="flex justify-between">
+                      <span>Total Posts</span>
+                      <span class="font-bold">{posts.length}</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>This Month</span>
+                      <span class="font-bold">
+                        {posts.filter(p => {
+                          const postDate = new Date(p.date);
+                          const now = new Date();
+                          return postDate.getMonth() === now.getMonth() && postDate.getFullYear() === now.getFullYear();
+                        }).length}
+                      </span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>With Images</span>
+                      <span class="font-bold">{posts.filter(p => p.imageURL).length}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 class="font-bold text-gray-400 mb-3">ENGAGEMENT TIPS</h4>
+                  <ul class="space-y-2 text-sm">
+                    <li class="flex items-start gap-2">
+                      <span class="text-gym-red">•</span>
+                      <span>Post 2-3 times per week for best engagement</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                      <span class="text-gym-red">•</span>
+                      <span>Include images to increase visibility</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                      <span class="text-gym-red">•</span>
+                      <span>Respond to messages within 24 hours</span>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
@@ -446,3 +637,42 @@
     {/if}
   </main>
 </div>
+
+<style>
+  .glow-text {
+    text-shadow: 0 0 10px rgba(220, 38, 38, 0.8);
+  }
+  
+  .futuristic-card {
+    background: linear-gradient(135deg, rgba(31, 41, 55, 0.1) 0%, rgba(17, 24, 39, 0.1) 100%);
+    backdrop-filter: blur(10px);
+  }
+  
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-slide-up {
+    animation: slide-up 0.6s ease-out;
+  }
+  
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .animate-spin {
+    animation: spin 1s linear infinite;
+  }
+</style>
