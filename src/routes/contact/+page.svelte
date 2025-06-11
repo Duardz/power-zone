@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
   import { isFirebaseReady, getFirebaseDb } from '$lib/firebase';
+  import DOMPurify from 'dompurify'; // You'll need to install this: npm install dompurify @types/dompurify
   
   let mounted = false;
   let formData = {
@@ -16,12 +17,86 @@
   let submitMessage = '';
   let submitStatus: 'success' | 'error' | '' = '';
   
+  // Rate limiting
+  let lastSubmitTime = 0;
+  const RATE_LIMIT_MS = 60000; // 1 minute between submissions
+  
+  // Honeypot field for bot detection
+  let honeypot = '';
+  
   onMount(() => {
     mounted = true;
+    
+    // Clear any stored form data on mount for security
+    if (typeof window !== 'undefined') {
+      window.addEventListener('beforeunload', clearSensitiveData);
+    }
+    
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('beforeunload', clearSensitiveData);
+      }
+    };
   });
+  
+  function clearSensitiveData() {
+    formData = { name: '', email: '', phone: '', message: '', interest: 'general' };
+  }
+  
+  // Input sanitization function
+  function sanitizeInput(input: string, maxLength: number): string {
+    // Remove any HTML tags and trim
+    const cleaned = input.replace(/<[^>]*>?/gm, '').trim();
+    // Limit length
+    return cleaned.slice(0, maxLength);
+  }
+  
+  // Phone number validation and sanitization
+  function sanitizePhone(phone: string): string {
+    // Remove all non-numeric characters except + and spaces
+    return phone.replace(/[^0-9+\s]/g, '').slice(0, 20);
+  }
+  
+  // Enhanced email validation
+  function isValidEmail(email: string): boolean {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const suspiciousPatterns = [
+      /(.)\1{4,}/, // Repeated characters
+      /<script/i,   // Script tags
+      /javascript:/i, // JavaScript protocol
+      /on\w+=/i     // Event handlers
+    ];
+    
+    if (!emailRegex.test(email)) return false;
+    
+    // Check for suspicious patterns
+    for (const pattern of suspiciousPatterns) {
+      if (pattern.test(email)) return false;
+    }
+    
+    // Check email length
+    if (email.length > 254) return false;
+    
+    return true;
+  }
   
   async function handleSubmit(e: Event) {
     e.preventDefault();
+    
+    // Check honeypot (anti-bot)
+    if (honeypot) {
+      console.warn('Bot detected');
+      return;
+    }
+    
+    // Rate limiting
+    const now = Date.now();
+    if (now - lastSubmitTime < RATE_LIMIT_MS) {
+      submitMessage = `Please wait ${Math.ceil((RATE_LIMIT_MS - (now - lastSubmitTime)) / 1000)} seconds before submitting again.`;
+      submitStatus = 'error';
+      return;
+    }
+    
     isSubmitting = true;
     submitMessage = '';
     submitStatus = '';
@@ -35,9 +110,23 @@
     }
     
     // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
+    if (!isValidEmail(formData.email)) {
       submitMessage = 'Please enter a valid email address.';
+      submitStatus = 'error';
+      isSubmitting = false;
+      return;
+    }
+    
+    // Message length validation
+    if (formData.message.length < 10) {
+      submitMessage = 'Message must be at least 10 characters long.';
+      submitStatus = 'error';
+      isSubmitting = false;
+      return;
+    }
+    
+    if (formData.message.length > 1000) {
+      submitMessage = 'Message must be less than 1000 characters.';
       submitStatus = 'error';
       isSubmitting = false;
       return;
@@ -45,46 +134,71 @@
     
     try {
       if (!isFirebaseReady()) {
-        // Fallback for when Firebase is not available
-        console.log('Firebase not ready, simulating submission:', formData);
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        submitMessage = 'Message sent! We\'ll contact you within 24 hours.';
-        submitStatus = 'success';
-        formData = { name: '', email: '', phone: '', message: '', interest: 'general' };
-        return;
+        throw new Error('Service temporarily unavailable. Please try again later.');
       }
       
       const db = getFirebaseDb();
       
-      // Sanitize input data
+      // Sanitize all inputs
       const sanitizedData = {
-        name: formData.name.trim().slice(0, 100),
-        email: formData.email.trim().toLowerCase().slice(0, 100),
-        phone: formData.phone.trim().slice(0, 20),
-        message: formData.message.trim().slice(0, 1000),
-        interest: formData.interest,
+        name: sanitizeInput(formData.name, 100),
+        email: sanitizeInput(formData.email.toLowerCase(), 254),
+        phone: sanitizePhone(formData.phone),
+        message: sanitizeInput(formData.message, 1000),
+        interest: ['general', 'membership', 'visit', 'feedback'].includes(formData.interest) 
+          ? formData.interest 
+          : 'general',
         timestamp: serverTimestamp(),
-        read: false
+        read: false,
+        // Add security metadata
+        submittedAt: new Date().toISOString(),
+        formVersion: '1.0'
       };
+      
+      // Validate sanitized data one more time
+      if (!sanitizedData.name || !sanitizedData.email || !sanitizedData.message) {
+        throw new Error('Invalid form data');
+      }
       
       await addDoc(collection(db, 'messages'), sanitizedData);
       
-      submitMessage = 'Message sent! We\'ll contact you within 24 hours.';
+      submitMessage = 'Message sent successfully! We\'ll contact you within 24 hours.';
       submitStatus = 'success';
-      // Reset form
+      lastSubmitTime = Date.now();
+      
+      // Clear form
       formData = { name: '', email: '', phone: '', message: '', interest: 'general' };
     } catch (error) {
       console.error('Error submitting form:', error);
-      submitMessage = 'Failed to send. Please call us at +63 926 922 8903.';
+      
+      // Don't expose internal error details to user
+      if (error instanceof Error && error.message.includes('Service temporarily unavailable')) {
+        submitMessage = error.message;
+      } else {
+        submitMessage = 'Failed to send message. Please try again or call us directly.';
+      }
       submitStatus = 'error';
     } finally {
       isSubmitting = false;
+    }
+  }
+  
+  // Prevent paste of rich text in message field
+  function handlePaste(e: ClipboardEvent) {
+    e.preventDefault();
+    const text = e.clipboardData?.getData('text/plain');
+    if (text && e.target instanceof HTMLTextAreaElement) {
+      const start = e.target.selectionStart;
+      const end = e.target.selectionEnd;
+      const newValue = formData.message.substring(0, start) + text + formData.message.substring(end);
+      formData.message = newValue.slice(0, 1000);
     }
   }
 </script>
 
 <svelte:head>
   <title>Contact PowerZone - Gym in Dingalan, Aurora</title>
+  <meta name="description" content="Contact PowerZone Gym in Dingalan, Aurora. Call us at +63 926 922 8903 or send us a message. We're here to help you start your fitness journey.">
 </svelte:head>
 
 <!-- Simplified Hero Section -->
@@ -108,7 +222,18 @@
         <div class="futuristic-card p-8 border border-gray-700 hover:border-gym-red/60 transition-all duration-300">
           <h2 class="text-2xl font-black mb-6 text-white">SEND A MESSAGE</h2>
           
-          <form on:submit={handleSubmit} class="space-y-5">
+          <form on:submit={handleSubmit} class="space-y-5" novalidate>
+            <!-- Honeypot field (hidden from users) -->
+            <div style="position: absolute; left: -5000px;" aria-hidden="true">
+              <input 
+                type="text" 
+                name="website" 
+                tabindex="-1" 
+                autocomplete="off"
+                bind:value={honeypot}
+              />
+            </div>
+            
             <!-- Name Field -->
             <div>
               <label for="name" class="block text-sm font-bold uppercase tracking-wider mb-2 text-gray-400">
@@ -120,7 +245,9 @@
                 bind:value={formData.name}
                 required
                 disabled={isSubmitting}
-                class="w-full px-4 py-3 bg-black border border-gray-800 rounded-lg 
+                maxlength="100"
+                pattern="[A-Za-z\s\-']+"
+                class="w-full px-4 py-3 bg-black/80 border border-gray-800 rounded-lg 
                        focus:border-gym-red focus:outline-none transition-all duration-300
                        hover:border-gray-700 disabled:opacity-50"
                 placeholder="Your name"
@@ -138,7 +265,8 @@
                 bind:value={formData.email}
                 required
                 disabled={isSubmitting}
-                class="w-full px-4 py-3 bg-black border border-gray-800 rounded-lg 
+                maxlength="254"
+                class="w-full px-4 py-3 bg-black/80 border border-gray-800 rounded-lg 
                        focus:border-gym-red focus:outline-none transition-all duration-300
                        hover:border-gray-700 disabled:opacity-50"
                 placeholder="your@email.com"
@@ -155,7 +283,9 @@
                 id="phone"
                 bind:value={formData.phone}
                 disabled={isSubmitting}
-                class="w-full px-4 py-3 bg-black border border-gray-800 rounded-lg 
+                maxlength="20"
+                pattern="[0-9+\s\-]+"
+                class="w-full px-4 py-3 bg-black/80 border border-gray-800 rounded-lg 
                        focus:border-gym-red focus:outline-none transition-all duration-300
                        hover:border-gray-700 disabled:opacity-50"
                 placeholder="+63 XXX XXX XXXX"
@@ -171,7 +301,7 @@
                 id="interest"
                 bind:value={formData.interest}
                 disabled={isSubmitting}
-                class="w-full px-4 py-3 bg-black text-white border border-gray-800 rounded-lg 
+                class="w-full px-4 py-3 bg-black/80 text-white border border-gray-800 rounded-lg 
                       focus:border-gym-red focus:outline-none transition-all duration-300 
                       hover:border-gray-700 cursor-pointer disabled:opacity-50"
               >
@@ -186,27 +316,34 @@
             <div>
               <label for="message" class="block text-sm font-bold uppercase tracking-wider mb-2 text-gray-400">
                 Message <span class="text-gym-red">*</span>
+                <span class="text-xs font-normal text-gray-600 float-right">
+                  {formData.message.length}/1000
+                </span>
               </label>
               <textarea
                 id="message"
                 bind:value={formData.message}
+                on:paste={handlePaste}
                 required
                 disabled={isSubmitting}
                 rows="4"
-                class="w-full px-4 py-3 bg-black border border-gray-800 rounded-lg 
+                maxlength="1000"
+                class="w-full px-4 py-3 bg-black/80 border border-gray-800 rounded-lg 
                        focus:border-gym-red focus:outline-none transition-all duration-300
                        hover:border-gray-700 resize-none disabled:opacity-50"
-                placeholder="How can we help you?"
+                placeholder="How can we help you? (minimum 10 characters)"
               ></textarea>
             </div>
             
             <!-- Submit Button -->
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || formData.message.length < 10}
               class="w-full py-4 bg-gym-red font-black uppercase tracking-wider 
                      transition-all duration-300 hover:bg-red-700
-                     disabled:opacity-50 disabled:cursor-not-allowed"
+                     disabled:opacity-50 disabled:cursor-not-allowed
+                     hover:shadow-[0_0_30px_rgba(220,38,38,0.5)]"
+              aria-label="Send message"
             >
               {isSubmitting ? 'SENDING...' : 'SEND MESSAGE'}
             </button>
@@ -215,10 +352,17 @@
               <div class="p-4 rounded-lg text-center animate-slide-up
                           {submitStatus === 'success' 
                             ? 'bg-green-500/10 text-green-400' 
-                            : 'bg-red-500/10 text-red-400'}">
+                            : 'bg-red-500/10 text-red-400'}"
+                   role="alert">
                 {submitMessage}
               </div>
             {/if}
+            
+            <!-- Privacy Notice -->
+            <p class="text-xs text-gray-500 text-center">
+              By submitting this form, you agree to our privacy policy. 
+              We'll only use your information to respond to your inquiry.
+            </p>
           </form>
         </div>
       </div>
@@ -226,28 +370,28 @@
       <!-- Contact Info - Simplified -->
       <div class="lg:col-span-2 space-y-6 {mounted ? 'animate-slide-up' : ''}" style="animation-delay: 0.1s">
         <!-- Quick Contact -->
-        <div class="futuristic-card p-6 border border-gray-800">
-          <h3 class="font-black text-xl mb-4">QUICK CONTACT</h3>
+        <div class="futuristic-card p-6 border border-gray-700 hover:border-gym-red/60 transition-all duration-300">
+          <h3 class="font-black text-xl mb-4 text-white">QUICK CONTACT</h3>
           
           <div class="space-y-4">
             <!-- Phone -->
             <a href="tel:+639269228903" 
-               class="flex items-center gap-3 p-3 bg-black border border-gray-800 rounded-lg
-                      hover:border-gym-red transition-all duration-300 group">
-              <span class="text-2xl">📞</span>
+               class="flex items-center gap-3 p-4 bg-black/60 border border-gray-700 rounded-lg
+                      hover:border-gym-red hover:bg-gym-red/10 transition-all duration-300 group">
+              <span class="text-2xl" aria-hidden="true">📞</span>
               <div>
-                <p class="font-bold group-hover:text-gym-red transition-colors">+63 926 922 8903</p>
+                <p class="font-bold text-white group-hover:text-gym-red transition-colors">+63 926 922 8903</p>
                 <p class="text-xs text-gray-400">Tap to call</p>
               </div>
             </a>
             
             <!-- Email -->
             <a href="mailto:powerzone@gmail.com" 
-               class="flex items-center gap-3 p-3 bg-black border border-gray-800 rounded-lg
-                      hover:border-gym-red transition-all duration-300 group">
-              <span class="text-2xl">✉️</span>
+               class="flex items-center gap-3 p-4 bg-black/60 border border-gray-700 rounded-lg
+                      hover:border-gym-red hover:bg-gym-red/10 transition-all duration-300 group">
+              <span class="text-2xl" aria-hidden="true">✉️</span>
               <div>
-                <p class="font-bold group-hover:text-gym-red transition-colors">powerzone@gmail.com</p>
+                <p class="font-bold text-white group-hover:text-gym-red transition-colors">powerzone@gmail.com</p>
                 <p class="text-xs text-gray-400">Tap to email</p>
               </div>
             </a>
@@ -255,39 +399,52 @@
         </div>
         
         <!-- Location -->
-        <div class="futuristic-card p-6 border border-gray-800">
-          <h3 class="font-black text-xl mb-4">FIND US</h3>
+        <div class="futuristic-card p-6 border border-gray-700 hover:border-gym-red/60 transition-all duration-300">
+          <h3 class="font-black text-xl mb-4 text-white">FIND US</h3>
           
           <div class="space-y-3">
-            <p class="text-gray-300">
-              <span class="font-bold">Purok Mulawin, Paltic</span><br>
+            <p class="text-gray-200">
+              <span class="font-bold text-white">Purok Mulawin, Paltic</span><br>
               Dingalan, Aurora
             </p>
             
-            <!-- Embedded Google Map -->
-            <div class="relative h-48 bg-gray-900 rounded-lg overflow-hidden">
+            <!-- Embedded Google Map with CSP-safe implementation -->
+            <div class="relative h-48 bg-gray-800 rounded-lg overflow-hidden border border-gray-700">
+              <!-- Static map image as fallback -->
+              <div class="absolute inset-0 flex items-center justify-center bg-gray-900">
+                <div class="text-center p-4">
+                  <div class="text-4xl mb-2">📍</div>
+                  <p class="text-white font-bold">PowerZone Gym</p>
+                  <p class="text-sm text-gray-400">Purok Mulawin, Paltic</p>
+                  <p class="text-sm text-gray-400">Dingalan, Aurora</p>
+                </div>
+              </div>
+              
+              <!-- Optional: Add iframe only if you have a valid API key -->
+              <!-- 
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3847.5!2d121.3931!3d15.3489!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTXCsDIwJzU2LjAiTiAxMjHCsDIzJzM1LjIiRQ!5e0!3m2!1sen!2sph!4v1234567890"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3847.5!2d121.3931!3d15.3489!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33397f3be522cbe1%3A0x0!2zMTXCsDIwJzU2LjAiTiAxMjHCsDIzJzM1LjIiRQ!5e0!3m2!1sen!2sph!4v1234567890!5m2!1sen!2sph"
                 width="100%"
                 height="100%"
-                style="border:0; filter: grayscale(100%) contrast(1.2);"
+                style="border:0;"
                 allowfullscreen={true}
                 loading="lazy"
                 referrerpolicy="no-referrer-when-downgrade"
                 title="PowerZone Gym Location"
               ></iframe>
+              -->
               
               <!-- Overlay for styling -->
-              <div class="absolute inset-0 bg-gym-red/10 pointer-events-none"></div>
+              <div class="absolute inset-0 bg-gym-red/5 pointer-events-none"></div>
             </div>
             
             <a 
               href="https://www.google.com/maps/dir/?api=1&destination=Purok+Mulawin+Paltic+Dingalan+Aurora"
               target="_blank"
               rel="noopener noreferrer"
-              class="block w-full py-3 text-center bg-black border border-gym-red text-gym-red
+              class="block w-full py-3 text-center bg-gym-red/20 border border-gym-red text-gym-red
                      font-bold uppercase tracking-wider hover:bg-gym-red hover:text-white
-                     transition-all duration-300"
+                     transition-all duration-300 hover:shadow-[0_0_20px_rgba(220,38,38,0.5)]"
             >
               Get Directions
             </a>
@@ -295,9 +452,9 @@
         </div>
         
         <!-- Hours -->
-        <div class="futuristic-card p-6 border border-gray-800">
-          <h3 class="font-black text-xl mb-4">GYM HOURS</h3>
-          <p class="text-gray-300">
+        <div class="futuristic-card p-6 border border-gray-700 hover:border-gym-red/60 transition-all duration-300">
+          <h3 class="font-black text-xl mb-4 text-white">GYM HOURS</h3>
+          <p class="text-gray-200">
             <span class="font-bold text-white">Monday - Sunday</span><br>
             Open 7 days a week<br>
             <span class="text-sm text-gray-400">Call for specific hours</span>
@@ -378,13 +535,15 @@
     box-shadow: 0 4px 20px rgba(220, 38, 38, 0.3);
   }
   
-  button[type="submit"]:hover {
+  button[type="submit"]:hover:not(:disabled) {
     background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
     box-shadow: 0 6px 30px rgba(220, 38, 38, 0.5);
   }
   
   /* Map overlay enhancement */
-  iframe {
-    filter: grayscale(80%) contrast(1.1) brightness(0.9);
+  
+  /* Security: Hide honeypot field completely */
+  input[name="website"] {
+    display: none !important;
   }
 </style>
