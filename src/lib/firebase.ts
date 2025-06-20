@@ -1,3 +1,4 @@
+// src/lib/firebase.ts
 import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
 import { getAuth, type Auth } from 'firebase/auth';
 import { getFirestore, type Firestore } from 'firebase/firestore';
@@ -28,6 +29,36 @@ function validateFirebaseConfig(config: typeof firebaseConfig): boolean {
 let app: FirebaseApp | undefined;
 let auth: Auth | undefined;
 let db: Firestore | undefined;
+
+// Security monitoring for failed auth attempts
+export const securityMonitor = {
+  failedAttempts: 0,
+  lastAttemptTime: 0,
+  maxAttempts: 5,
+  lockoutDuration: 300000, // 5 minutes
+  
+  recordFailure() {
+    this.failedAttempts++;
+    this.lastAttemptTime = Date.now();
+  },
+  
+  canAttempt(): boolean {
+    if (this.failedAttempts < this.maxAttempts) return true;
+    
+    const timeSinceLastAttempt = Date.now() - this.lastAttemptTime;
+    if (timeSinceLastAttempt > this.lockoutDuration) {
+      this.reset();
+      return true;
+    }
+    
+    return false;
+  },
+  
+  reset() {
+    this.failedAttempts = 0;
+    this.lastAttemptTime = 0;
+  }
+};
 
 if (browser) {
   try {
@@ -63,6 +94,12 @@ export function getFirebaseAuth(): Auth {
   if (!auth) {
     throw new Error('Firebase Auth is not initialized');
   }
+  
+  // Check security monitor for auth operations
+  if (!securityMonitor.canAttempt()) {
+    throw new Error('Too many failed attempts. Please try again later.');
+  }
+  
   return auth;
 }
 

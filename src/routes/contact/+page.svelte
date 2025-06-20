@@ -2,7 +2,13 @@
   import { onMount } from 'svelte';
   import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
   import { isFirebaseReady, getFirebaseDb } from '$lib/firebase';
-  import DOMPurify from 'dompurify'; // You'll need to install this: npm install dompurify @types/dompurify
+  import { 
+    validateEmail, 
+    sanitizeText, 
+    validatePhone, 
+    checkRateLimit,
+    detectXSS 
+  } from '$lib/utils/validation';
   
   let mounted = false;
   let formData = {
@@ -16,10 +22,6 @@
   let isSubmitting = false;
   let submitMessage = '';
   let submitStatus: 'success' | 'error' | '' = '';
-  
-  // Rate limiting
-  let lastSubmitTime = 0;
-  const RATE_LIMIT_MS = 60000; // 1 minute between submissions
   
   // Honeypot field for bot detection
   let honeypot = '';
@@ -43,43 +45,6 @@
     formData = { name: '', email: '', phone: '', message: '', interest: 'general' };
   }
   
-  // Input sanitization function
-  function sanitizeInput(input: string, maxLength: number): string {
-    // Remove any HTML tags and trim
-    const cleaned = input.replace(/<[^>]*>?/gm, '').trim();
-    // Limit length
-    return cleaned.slice(0, maxLength);
-  }
-  
-  // Phone number validation and sanitization
-  function sanitizePhone(phone: string): string {
-    // Remove all non-numeric characters except + and spaces
-    return phone.replace(/[^0-9+\s]/g, '').slice(0, 20);
-  }
-  
-  // Enhanced email validation
-  function isValidEmail(email: string): boolean {
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    const suspiciousPatterns = [
-      /(.)\1{4,}/, // Repeated characters
-      /<script/i,   // Script tags
-      /javascript:/i, // JavaScript protocol
-      /on\w+=/i     // Event handlers
-    ];
-    
-    if (!emailRegex.test(email)) return false;
-    
-    // Check for suspicious patterns
-    for (const pattern of suspiciousPatterns) {
-      if (pattern.test(email)) return false;
-    }
-    
-    // Check email length
-    if (email.length > 254) return false;
-    
-    return true;
-  }
-  
   async function handleSubmit(e: Event) {
     e.preventDefault();
     
@@ -89,10 +54,10 @@
       return;
     }
     
-    // Rate limiting
-    const now = Date.now();
-    if (now - lastSubmitTime < RATE_LIMIT_MS) {
-      submitMessage = `Please wait ${Math.ceil((RATE_LIMIT_MS - (now - lastSubmitTime)) / 1000)} seconds before submitting again.`;
+    // Rate limiting - use a unique key per user/session
+    const rateLimitKey = `contact_${new Date().toISOString().split('T')[0]}`; // Daily limit
+    if (!checkRateLimit(rateLimitKey, 10, 86400000)) { // 10 submissions per day
+      submitMessage = 'You have reached the daily submission limit. Please try again tomorrow.';
       submitStatus = 'error';
       return;
     }
@@ -109,9 +74,19 @@
       return;
     }
     
-    // Email validation
-    if (!isValidEmail(formData.email)) {
-      submitMessage = 'Please enter a valid email address.';
+    // Email validation using utility
+    const emailValidation = validateEmail(formData.email);
+    if (!emailValidation.valid) {
+      submitMessage = emailValidation.error || 'Invalid email address';
+      submitStatus = 'error';
+      isSubmitting = false;
+      return;
+    }
+    
+    // Phone validation using utility
+    const phoneValidation = validatePhone(formData.phone);
+    if (!phoneValidation.valid) {
+      submitMessage = 'Invalid phone number format';
       submitStatus = 'error';
       isSubmitting = false;
       return;
@@ -132,6 +107,14 @@
       return;
     }
     
+    // XSS detection
+    if (detectXSS(formData.name) || detectXSS(formData.message)) {
+      submitMessage = 'Invalid characters detected in your submission.';
+      submitStatus = 'error';
+      isSubmitting = false;
+      return;
+    }
+    
     try {
       if (!isFirebaseReady()) {
         throw new Error('Service temporarily unavailable. Please try again later.');
@@ -139,12 +122,12 @@
       
       const db = getFirebaseDb();
       
-      // Sanitize all inputs
+      // Sanitize all inputs using utility functions
       const sanitizedData = {
-        name: sanitizeInput(formData.name, 100),
-        email: sanitizeInput(formData.email.toLowerCase(), 254),
-        phone: sanitizePhone(formData.phone),
-        message: sanitizeInput(formData.message, 1000),
+        name: sanitizeText(formData.name, 100),
+        email: formData.email.toLowerCase().trim(),
+        phone: phoneValidation.sanitized,
+        message: sanitizeText(formData.message, 1000),
         interest: ['general', 'membership', 'visit', 'feedback'].includes(formData.interest) 
           ? formData.interest 
           : 'general',
@@ -152,10 +135,11 @@
         read: false,
         // Add security metadata
         submittedAt: new Date().toISOString(),
-        formVersion: '1.0'
+        formVersion: '1.0',
+        // Don't store sensitive data like IP or full user agent
       };
       
-      // Validate sanitized data one more time
+      // Final validation
       if (!sanitizedData.name || !sanitizedData.email || !sanitizedData.message) {
         throw new Error('Invalid form data');
       }
@@ -164,10 +148,10 @@
       
       submitMessage = 'Message sent successfully! We\'ll contact you within 24 hours.';
       submitStatus = 'success';
-      lastSubmitTime = Date.now();
       
-      // Clear form
+      // Clear form and honeypot
       formData = { name: '', email: '', phone: '', message: '', interest: 'general' };
+      honeypot = '';
     } catch (error) {
       console.error('Error submitting form:', error);
       
@@ -246,7 +230,6 @@
                 required
                 disabled={isSubmitting}
                 maxlength="100"
-                pattern="[A-Za-z\s\-']+"
                 class="w-full px-4 py-3 bg-black/80 border border-gray-800 rounded-lg 
                        focus:border-gym-red focus:outline-none transition-all duration-300
                        hover:border-gray-700 disabled:opacity-50"
@@ -284,7 +267,6 @@
                 bind:value={formData.phone}
                 disabled={isSubmitting}
                 maxlength="20"
-                pattern="[0-9+\s\-]+"
                 class="w-full px-4 py-3 bg-black/80 border border-gray-800 rounded-lg 
                        focus:border-gym-red focus:outline-none transition-all duration-300
                        hover:border-gray-700 disabled:opacity-50"
@@ -408,9 +390,8 @@
               Dingalan, Aurora
             </p>
             
-            <!-- Embedded Google Map with CSP-safe implementation -->
+            <!-- Map placeholder -->
             <div class="relative h-48 bg-gray-800 rounded-lg overflow-hidden border border-gray-700">
-              <!-- Static map image as fallback -->
               <div class="absolute inset-0 flex items-center justify-center bg-gray-900">
                 <div class="text-center p-4">
                   <div class="text-4xl mb-2">📍</div>
@@ -419,22 +400,6 @@
                   <p class="text-sm text-gray-400">Dingalan, Aurora</p>
                 </div>
               </div>
-              
-              <!-- Optional: Add iframe only if you have a valid API key -->
-              <!-- 
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3847.5!2d121.3931!3d15.3489!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33397f3be522cbe1%3A0x0!2zMTXCsDIwJzU2LjAiTiAxMjHCsDIzJzM1LjIiRQ!5e0!3m2!1sen!2sph!4v1234567890!5m2!1sen!2sph"
-                width="100%"
-                height="100%"
-                style="border:0;"
-                allowfullscreen={true}
-                loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade"
-                title="PowerZone Gym Location"
-              ></iframe>
-              -->
-              
-              <!-- Overlay for styling -->
               <div class="absolute inset-0 bg-gym-red/5 pointer-events-none"></div>
             </div>
             
@@ -539,8 +504,6 @@
     background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
     box-shadow: 0 6px 30px rgba(220, 38, 38, 0.5);
   }
-  
-  /* Map overlay enhancement */
   
   /* Security: Hide honeypot field completely */
   input[name="website"] {
